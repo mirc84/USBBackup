@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ÛSBBackup.Properties
+namespace USBBackup.Properties
 {
 
 

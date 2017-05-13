@@ -35,6 +35,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ookii.Dialogs.Wpf, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0c15020868fd6249, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\ExternalLibraries\Ookii.Dialogs.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -58,12 +62,30 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="App.cs" />
+    <Compile Include="BackupHandler.cs" />
+    <Compile Include="Controls\FolderBrowseControl.xaml.cs">
+      <DependentUpon>FolderBrowseControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Core\NotificationObject.cs" />
+    <Compile Include="Core\RelayCommand.cs" />
+    <Compile Include="DatabaseAccess\Database.cs" />
+    <Compile Include="DatabaseAccess\DatabaseConnection.cs" />
+    <Compile Include="Entities\BackupInfo.cs" />
+    <Compile Include="Entities\DatabaseModel.cs" />
+    <Compile Include="Entities\USBDeviceInfo.cs" />
     <Compile Include="Lib\NotificationObject.cs" />
     <Compile Include="Lib\RelayCommand.cs" />
     <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="TrayIcon.cs" />
+    <Compile Include="UIElementExtension.cs" />
     <Compile Include="USBDeviceInfo.cs" />
+    <Compile Include="UsbDeviceRepository.cs" />
     <Compile Include="USBWatcher.cs" />
+    <Page Include="Controls\FolderBrowseControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
