@@ -17,11 +17,21 @@ namespace USBBackup.Entities
             Backups = new List<BackupInfo>();
         }
 
-        public string DeviceID { get; private set; }
-        public string PnpDeviceID { get; private set; }
-        public string Description { get; private set; }
-        public bool IsAttached { get; set; }
-        public bool IsEnabled { get; set; }
-        public IList<BackupInfo> Backups { get; set; }
+        public virtual string DeviceID { get; private set; }
+        public virtual string PnpDeviceID { get; private set; }
+        public virtual string Description { get; private set; }
+        public virtual bool IsAttached { get; set; }
+        public virtual bool IsEnabled { get; set; }
+        public virtual IList<BackupInfo> Backups { get; set; }
+    }
+    public class USBDeviceInfoMap : DatabaseModelMap<USBDeviceInfo>
+    {
+        public USBDeviceInfoMap()
+        {
+            Map(x => x.DeviceID);
+            Map(x => x.Description);
+            Map(x => x.IsEnabled);
+            HasMany(x => x.Backups);
+        }
     }
 }

@@ -10,14 +10,14 @@ namespace USBBackup
     internal class UsbDeviceRepository
     {
         private readonly USBWatcher _watcher;
-        private readonly Database _database;
+        private readonly DatabaseContext _databaseContext;
         private readonly BackupHandler _backupHandler;
         private readonly Dispatcher _dispatcher;
 
-        public UsbDeviceRepository(USBWatcher watcher, Database database, BackupHandler backupHandler, Dispatcher dispatcher)
+        public UsbDeviceRepository(USBWatcher watcher, DatabaseContext databaseContext, BackupHandler backupHandler, Dispatcher dispatcher)
         {
             _watcher = watcher;
-            _database = database;
+            _databaseContext = databaseContext;
             _backupHandler = backupHandler;
             _dispatcher = dispatcher;
 
@@ -29,8 +29,8 @@ namespace USBBackup
 
         public void Init()
         {
-            _database.BackupInfos.ToList();
-            var usbDevices = _database.USBDeviceInfos.ToList();
+            _databaseContext.BackupInfos.ToList();
+            var usbDevices = _databaseContext.USBDeviceInfos.ToList();
             foreach (var usbDeviceInfo in usbDevices)
                 USBDevices.Add(usbDeviceInfo);
 

@@ -8,7 +8,7 @@ namespace USBBackup
     {
         private USBWatcher _watcher;
         private UsbDeviceRepository _deviceRepository;
-        private Database _database;
+        private DatabaseContext _databaseContext;
         private BackupHandler _backupHandler;
 
         [STAThread]
@@ -34,8 +34,8 @@ namespace USBBackup
             _backupHandler = new BackupHandler();
             _watcher = new USBWatcher();
             _watcher.Init();
-            _database = new Database();
-            _deviceRepository = new UsbDeviceRepository(_watcher, _database, _backupHandler, Dispatcher.CurrentDispatcher);
+            _databaseContext = new DatabaseContext();
+            _deviceRepository = new UsbDeviceRepository(_watcher, _databaseContext, _backupHandler, Dispatcher.CurrentDispatcher);
             _deviceRepository.Init();
         }
 

@@ -5,7 +5,7 @@
         private string _sourcePath;
         private string _targetPath;
 
-        public string SourcePath
+        public virtual string SourcePath
         {
             get { return _sourcePath; }
             set
@@ -15,7 +15,7 @@
             }
         }
 
-        public string TargetPath
+        public virtual string TargetPath
         {
             get { return _targetPath; }
             set
@@ -23,6 +23,14 @@
                 _targetPath = value;
                 OnPropertyChanged();
             }
+        }
+    }
+    public class BackupInfoMap : DatabaseModelMap<BackupInfo>
+    {
+        public BackupInfoMap()
+        {
+            Map(x => x.SourcePath);
+            Map(x => x.TargetPath);
         }
     }
 }
