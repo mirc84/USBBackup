@@ -2,7 +2,7 @@
 
 namespace USBBackup
 {
-    public class BackupHandler
+    internal class BackupHandler
     {
         public void HandleBackup(USBDeviceInfo usbDeviceInfo)
         {

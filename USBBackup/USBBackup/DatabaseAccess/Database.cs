@@ -3,7 +3,7 @@ using USBBackup.Entities;
 
 namespace USBBackup.DatabaseAccess
 {
-    public class Database : DbContext
+    internal class Database : DbContext
     {
         public Database()
         {

@@ -1,6 +1,6 @@
 ﻿namespace USBBackup.DatabaseAccess
 {
-    public class DatabaseConnection
+    internal class DatabaseConnection
     {
         public DatabaseConnection()
         {

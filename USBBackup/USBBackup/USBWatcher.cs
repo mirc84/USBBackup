@@ -8,7 +8,7 @@ using USBBackup.Entities;
 
 namespace USBBackup
 {
-    public delegate void USBDeviceAttachedHandler(USBDeviceInfo deviceInfo);
+    internal delegate void USBDeviceAttachedHandler(USBDeviceInfo deviceInfo);
 
     internal class USBWatcher : NotificationObject
     {
