@@ -35,7 +35,6 @@ namespace USBBackup
             _watcher = new USBWatcher();
             _watcher.Init();
             _database = new Database();
-            _database.Create();
             _deviceRepository = new UsbDeviceRepository(_watcher, _database, _backupHandler, Dispatcher.CurrentDispatcher);
             _deviceRepository.Init();
         }
