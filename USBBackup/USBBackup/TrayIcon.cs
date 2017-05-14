@@ -18,12 +18,50 @@ namespace USBBackup
             _icon = new NotifyIcon()
             {
                 Icon = (Icon)Resources.Hopstarter_Soft_Scraps_USB,
+                ContextMenu = new ContextMenu(),
                 Visible = true
             };
+            SetMenuItems();
 
             _icon.DoubleClick += OnIconDoubleClick;
             _window.StateChanged += OnWindowStateChanged;
             _lastState = _window.WindowState;
+        }
+
+        public event EventHandler RunBackupRequested;
+
+        private void SetMenuItems()
+        {
+            var runItem = new MenuItem()
+            {
+                Name = "Run Backup",
+                Text = "Run",
+            };
+            runItem.Click += OnRunBackupRequested;
+
+            var showWindowItem = new MenuItem()
+            {
+                Name = "Open",
+                Text = "Open",
+                DefaultItem = true
+            };
+            showWindowItem.Click += (_, __) => ShowWindow();
+
+            var closeItem = new MenuItem()
+            {
+                Name = "Close",
+                Text = "Close",
+            };
+            closeItem.Click += (_, __) => _window.Close();
+
+            _icon.ContextMenu.MenuItems.Add(showWindowItem);
+            _icon.ContextMenu.MenuItems.Add(runItem);
+            _icon.ContextMenu.MenuItems.Add(closeItem);
+        }
+
+        private void OnRunBackupRequested(object sender, EventArgs e)
+        {
+            RunBackupRequested?.Invoke(this, EventArgs.Empty);
         }
 
         private void OnWindowStateChanged(object sender, EventArgs e)
@@ -38,6 +76,11 @@ namespace USBBackup
         }
 
         private void OnIconDoubleClick(object sender, EventArgs e)
+        {
+            ShowWindow();
+        }
+
+        private void ShowWindow()
         {
             if (_window.ShowInTaskbar)
                 return;
