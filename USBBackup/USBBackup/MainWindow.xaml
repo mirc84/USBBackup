@@ -11,9 +11,21 @@
         d:DataContext="{d:DesignInstance local:MainWindowViewModel}"
         SizeToContent="WidthAndHeight">
     <Grid>
-        <ItemsControl ItemsSource="{Binding UsbDevices}" Grid.IsSharedSizeScope="True" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Margin="10" Orientation="Horizontal">
+            <Button Margin="4" Content="Save"
+                    Command="{Binding SaveCommand}" />
+            <Button Margin="4" Content="Run All Backups"
+                    Command="{Binding RunAllBackupsCommand}" />
+        </StackPanel>
+        
+        <ItemsControl Margin="10" Grid.Row="1" ItemsSource="{Binding UsbDevices}" Grid.IsSharedSizeScope="True" >
             <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="entities:USBDeviceInfo">
+                <DataTemplate DataType="local:USBDeviceNotificationWrapper">
                     <Expander IsExpanded="True">
                         <Expander.Header>
                             <Grid HorizontalAlignment="Stretch">
@@ -21,54 +33,65 @@
                                     <ColumnDefinition SharedSizeGroup="Id" Width="Auto"></ColumnDefinition>
                                     <ColumnDefinition SharedSizeGroup="Description" Width="*"></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding DeviceID}"></TextBlock>
-                                <TextBox Grid.Column="1" Text="{Binding Description, Mode=TwoWay}"></TextBox>
+                                <TextBlock Text="{Binding USBDevice.DeviceID}"></TextBlock>
+                                <TextBox Grid.Column="1" Text="{Binding USBDevice.Description, Mode=TwoWay}"></TextBox>
                             </Grid>
                         </Expander.Header>
 
-                        <!--<ItemsControl ItemsSource="{Binding Backups}">
+                        <ItemsControl ItemsSource="{Binding Drives}">
                             <ItemsControl.ItemTemplate>
-                                <DataTemplate DataType="entities:BackupInfo">
-                                    <controls:FolderBrowseControl  />
+                                <DataTemplate DataType="local:DriveNotificationWrapper">
+                                    <Expander IsExpanded="True" Margin="10,4,4,4">
+                                        <Expander.Header>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Margin="4" Text="{Binding DriveLetter}"></TextBlock>
+                                                <TextBlock Margin="4" Text="{Binding VolumeName}"></TextBlock>
+                                            </StackPanel>
+                                        </Expander.Header>
+                                        <StackPanel>
+                                            <Button Content="Run" 
+                                                    Command="{Binding RunBackupCommand}"
+                                                    CommandParameter="{Binding }"></Button>
+                                            <ItemsControl ItemsSource="{Binding Backups}">
+                                               <ItemsControl.ItemTemplate>
+                                                   <DataTemplate DataType="local:BackupNotificationWrapper">
+                                                       <Grid>
+                                                           <Grid.ColumnDefinitions>
+                                                               <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="Auto" />
+                                                                <ColumnDefinition Width="Auto" />
+                                                           </Grid.ColumnDefinitions>
+                                                           <Grid.RowDefinitions>
+                                                               <RowDefinition Height="*" />
+                                                               <RowDefinition Height="*" />
+                                                           </Grid.RowDefinitions>
 
+                                                           <TextBlock Text="Source"></TextBlock>
+                                                           <controls:FolderBrowseControl Grid.Row="1" Grid.Column="0"
+                                                                                         SelectedPath="{Binding SourcePath, Mode=TwoWay}" />
+                                                           <TextBlock Grid.Row="0" Grid.Column="1" Text="Target"></TextBlock>
+                                                           <controls:FolderBrowseControl Grid.Row="1" Grid.Column="1"
+                                                                                         SelectedPath="{Binding TargetPath, Mode=TwoWay}"/>
+
+                                                            <CheckBox Margin="4" Grid.Row="1" Grid.Column="2"
+                                                                      IsChecked="{Binding IsEnabled, Mode=TwoWay}"/>
+                                                            <Button Margin="4" Content="Run" Grid.Row="1" Grid.Column="3"
+                                                                    Command="{Binding RunBackupCommand}"
+                                                                    CommandParameter="{Binding }"></Button>
+                                                        </Grid>
+                                                   </DataTemplate>
+                                               </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+
+                                            <Button Content="Add" 
+                                                    Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.AddBackupCommand}"
+                                                    CommandParameter="{Binding }"></Button>
+                                        </StackPanel>
+                                    </Expander>
                                 </DataTemplate>
-                            </ItemsControl>
-                        </ItemsControl>-->
-
-                        <DataGrid Margin="4" AutoGenerateColumns="False" CanUserAddRows="True"
-                                  MouseDoubleClick="Control_OnMouseDoubleClick"
-                                  ItemsSource="{Binding Backups}">
-                            <DataGrid.Columns>
-                                <DataGridTemplateColumn Header="Source" Width="*">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBox Text="{Binding SourcePath, Mode=TwoWay}" />
-                                                <Button Grid.Column="1" Content="Open" Click="SourceButton_OnClick" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Header="Target" Width="*">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBox Text="{Binding TargetPath, Mode=TwoWay}" />
-                                                <Button Grid.Column="1" Content="Open" Click="TargetButton_OnClick" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                        </DataGrid>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </Expander>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

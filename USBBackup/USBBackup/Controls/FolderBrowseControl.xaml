@@ -12,7 +12,8 @@
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <TextBox Margin="2" Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:FolderBrowseControl}, Path=SelectedPath, Mode=TwoWay}"></TextBox>
-        <Button Margin="2" Grid.Column="0" Content="Open" Click="OpenButton_OnClick"></Button>
+        <TextBox Margin="2" MinWidth="100"
+                 Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:FolderBrowseControl}, Path=SelectedPath, Mode=TwoWay}"></TextBox>
+        <Button Margin="2" Grid.Column="1" Content="Open" Click="OpenButton_OnClick"></Button>
     </Grid>
 </UserControl>

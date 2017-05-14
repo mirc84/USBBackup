@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Management;
 using USBBackup.Core;
@@ -8,7 +9,7 @@ using USBBackup.Entities;
 
 namespace USBBackup
 {
-    internal delegate void USBDeviceAttachedHandler(USBDeviceInfo deviceInfo);
+    internal delegate void USBDeviceAttachedHandler(USBDevice deviceInfo);
 
     internal class USBWatcher : NotificationObject
     {
@@ -18,6 +19,9 @@ namespace USBBackup
         public USBWatcher()
         {
         }
+
+        public event USBDeviceAttachedHandler DeviceAttached;
+        public event USBDeviceAttachedHandler DeviceDetached;
 
         public void Init()
         {
@@ -33,20 +37,7 @@ namespace USBBackup
             _removeWatcher.Start();
         }
 
-        protected virtual void OnDeviceAttached(USBDeviceInfo deviceInfo)
-        {
-            DeviceAttached?.Invoke(deviceInfo);
-        }
-
-        protected virtual void OnDeviceDetached(USBDeviceInfo deviceInfo)
-        {
-            DeviceDetached?.Invoke(deviceInfo);
-        }
-
-        public event USBDeviceAttachedHandler DeviceAttached;
-        public event USBDeviceAttachedHandler DeviceDetached;
-
-        public IEnumerable<USBDeviceInfo> LoadUSBDevices()
+        public IEnumerable<USBDevice> LoadUSBDevices()
         {
             ManagementObjectCollection collection;
             using (var searcher = new ManagementObjectSearcher(@"Select * From Win32_USBHub"))
@@ -54,42 +45,103 @@ namespace USBBackup
                 collection = searcher.Get();
             }
 
-            foreach (var item in collection)
+            foreach (var item in collection.OfType<ManagementObject>())
             {
                 yield return CreateUSBDeviceInfo(item);
             }
         }
 
+        public IEnumerable<USBDevice> LoadUSBDevices(string deviceID)
+        {
+            ManagementObjectCollection collection;
+            using (var searcher = new ManagementObjectSearcher($"Select * From Win32_USBHub WHERE DeviceID='{deviceID.Replace("\\","\\\\")}'"))
+            {
+                collection = searcher.Get();
+            }
+
+            foreach (var item in collection.OfType<ManagementObject>())
+            {
+                yield return CreateUSBDeviceInfo(item);
+            }
+        }
+
+        public static IEnumerable<Drive> GetDrives(USBDevice device)
+        {
+            foreach (var controller in device.ManagementObject?.GetRelated("Win32_USBController").Cast<ManagementObject>() ?? new ManagementObject[0])
+            {
+                foreach (var obj in new ManagementObjectSearcher("ASSOCIATORS OF {Win32_USBController.DeviceID='" + controller["PNPDeviceID"].ToString() + "'}").Get().OfType<ManagementObject>())
+                {
+                    if (!obj.ToString().Contains("DeviceID"))
+                        continue;
+                    var devId = obj["DeviceID"].ToString();
+                    if (!devId.Contains("USBSTOR"))
+                        continue;
+
+                    var drives = new ManagementObjectSearcher("select * from Win32_DiskDrive").Get().Cast<ManagementBaseObject>().Where(x => x["PNPDeviceID"].ToString() == devId);
+
+                    foreach (var drive in drives.OfType<ManagementObject>())
+                    {
+                        foreach (var partition in drive.GetRelated("Win32_DiskPartition").OfType<ManagementObject>())
+                        {
+                            foreach (var logicalDrive in partition.GetRelated("Win32_LogicalDisk").OfType<ManagementObject>())
+                            {
+                                var volumeSerialNumber = logicalDrive["VolumeSerialNumber"].ToString();
+                                var driveLetter = logicalDrive["Name"].ToString();
+                                var name = logicalDrive["VolumeName"].ToString();
+                                yield return new Drive(driveLetter, name, volumeSerialNumber);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        protected virtual void OnDeviceAttached(USBDevice deviceInfo)
+        {
+            DeviceAttached?.Invoke(deviceInfo);
+        }
+
+        protected virtual void OnDeviceDetached(USBDevice deviceInfo)
+        {
+            DeviceDetached?.Invoke(deviceInfo);
+        }
+
         private void DeviceRemovedEvent(object sender, EventArrivedEventArgs e)
         {
-            var instance = (ManagementBaseObject)e.NewEvent["TargetInstance"];
-            var deviceId = (string) instance["DeviceID"];
+            var instance = e.NewEvent["TargetInstance"] as ManagementBaseObject;
+            if (instance == null)
+                return;
 
-            var deviceInfo = new USBDeviceInfo(deviceId, (string) instance["PNPDeviceID"], (string) instance["Description"]);
-            OnDeviceDetached(deviceInfo);
+            var deviceId = instance["DeviceID"].ToString();
+            var devices = LoadUSBDevices(deviceId);
+            foreach (var device in devices)
+                OnDeviceAttached(device);
+
+            //var deviceInfo = CreateUSBDeviceInfo(instance);
+            //OnDeviceDetached(deviceInfo);
         }
 
         private void DeviceInsertedEvent(object sender, EventArrivedEventArgs e)
         {
-            var instance = (ManagementBaseObject)e.NewEvent["TargetInstance"];
-            var device = CreateUSBDeviceInfo(instance);
+            var instance = e.NewEvent["TargetInstance"] as ManagementBaseObject;
+            if (instance == null)
+                return;
 
-            var query = $"SELECT * FROM Win32_LogicalDisk WHERE DeviceID='{device.DeviceID.Replace(@"\", @"\\")}'";
-            var diskCollection = new ManagementObjectSearcher(query).Get().Cast<ManagementBaseObject>();
-            foreach (var disk in diskCollection)
-            {
-                var name = (string)disk.GetPropertyValue("Name");
-            }
-
-            OnDeviceAttached(device);
+            var deviceId = instance["DeviceID"].ToString();
+            var devices = LoadUSBDevices(deviceId);
+            foreach(var device in devices)
+                OnDeviceAttached(device);
         }
 
-        private static USBDeviceInfo CreateUSBDeviceInfo(ManagementBaseObject device)
+        private static USBDevice CreateUSBDeviceInfo(ManagementObject obj)
         {
-            return new USBDeviceInfo(
-                    (string)device.GetPropertyValue("DeviceID"),
-                    (string)device.GetPropertyValue("PNPDeviceID"),
-                    (string)device.GetPropertyValue("Description"));
+            var device = new USBDevice(
+                    (string)obj.GetPropertyValue("DeviceID"),
+                    (string)obj.GetPropertyValue("PNPDeviceID"),
+                    (string)obj.GetPropertyValue("Description"), obj);
+
+            device.Drives = GetDrives(device).ToList();
+            return device;
         }
     }
 }

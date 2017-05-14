@@ -1,18 +1,25 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using USBBackup.Core;
+﻿using FluentNHibernate.Mapping;
+using System;
 
 namespace USBBackup.Entities
 {
-    public abstract class DatabaseModel : NotificationObject
+    public abstract class DatabaseModel
     {
-        [Key]
-        public Guid Id { get; set; }
+        public virtual Guid Id { get; set; }
 
-        public void SetId()
+        public virtual void SetId()
         {
             if (Id == Guid.Empty)
                 Id = Guid.NewGuid();
+        }
+    }
+
+    public abstract class DatabaseModelMap<T> : ClassMap<T>
+        where T: DatabaseModel
+    {
+        public DatabaseModelMap()
+        {
+            Id(x => x.Id).Unique();
         }
     }
 }
