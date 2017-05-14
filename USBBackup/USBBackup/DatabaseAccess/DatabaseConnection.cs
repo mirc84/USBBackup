@@ -40,41 +40,34 @@ namespace USBBackup.DatabaseAccess
             }
         }
 
-        public void SaveDevice(USBDevice device)
+        public void SaveDevice(Drive drive)
         {
-            if (!device.Drives.SelectMany(x => x.Backups).Any())
+            if (!drive.Backups.Any())
             {
-                DeleteIfPersited(device);
+                DeleteIfPersited(drive);
                 return;
             }
             using (var session = _sessionFactory.OpenSession())
             {
-                foreach (var drive in device.Drives)
+                foreach (var backup in drive.Backups)
                 {
-                    foreach (var backup in drive.Backups)
-                    {
-                        session.SaveOrUpdate(backup);
-                    }
-                    session.SaveOrUpdate(drive);
+                    session.SaveOrUpdate(backup);
                 }
-                session.SaveOrUpdate(device);
+                session.SaveOrUpdate(drive);
+
                 session.Flush();
             }
         }
 
-        private void DeleteIfPersited(USBDevice device)
+        private void DeleteIfPersited(Drive drive)
         {
             using (var session = _sessionFactory.OpenSession())
             {
-                foreach (var drive in device.Drives)
+                foreach (var backup in drive.Backups)
                 {
-                    foreach (var backup in drive.Backups)
-                    {
-                        session.Delete(backup);
-                    }
-                    session.Delete(drive);
+                    session.Delete(backup);
                 }
-                session.Delete(device);
+                session.Delete(drive);
             }
         }
 //
@@ -119,7 +112,7 @@ namespace USBBackup.DatabaseAccess
             new SchemaExport(config).Create(false, true);
         }
 
-        public void SaveDevices(IList<USBDevice> usbDevices)
+        public void SaveDevices(IList<Drive> usbDevices)
         {
             foreach (var device in usbDevices)
             {

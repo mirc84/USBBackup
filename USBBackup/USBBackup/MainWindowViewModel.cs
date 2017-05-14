@@ -10,7 +10,7 @@ namespace USBBackup
     class MainWindowViewModel : NotificationObject
     {
         private readonly UsbDeviceRepository _usbDeviceRepository;
-        private IList<USBDeviceNotificationWrapper> _usbDevices;
+        private IList<DriveNotificationWrapper> _usbDevices;
         private BackupHandler _backupHandler;
 
         public MainWindowViewModel(UsbDeviceRepository usbDeviceRepository, BackupHandler backupHandler)
@@ -22,7 +22,7 @@ namespace USBBackup
             RunBackupCommand = new RelayCommand(RunBackup);
             RunAllBackupsCommand = new RelayCommand(RunAllBackups);
             SaveCommand = new RelayCommand(Save);
-            UsbDevices = _usbDeviceRepository.USBDevices.Select(x => new USBDeviceNotificationWrapper(x)).ToList();
+            UsbDevices = _usbDeviceRepository.USBDevices.Select(x => new DriveNotificationWrapper(x)).ToList();
         }
 
         private void Save(object obj)
@@ -38,7 +38,7 @@ namespace USBBackup
             }
         }
 
-        public IList<USBDeviceNotificationWrapper> UsbDevices
+        public IList<DriveNotificationWrapper> UsbDevices
         {
             get { return _usbDevices; }
             set
@@ -55,9 +55,8 @@ namespace USBBackup
 
         private void OnUSBDevicesChanged(object sender, EventArgs eventArgs)
         {
-            UsbDevices = _usbDeviceRepository.USBDevices.Select(x => new USBDeviceNotificationWrapper(x)).ToList();
+            UsbDevices = _usbDeviceRepository.USBDevices.Select(x => new DriveNotificationWrapper(x)).ToList();
             
-
         }
 
         private void AddBackup(object obj)
@@ -72,12 +71,6 @@ namespace USBBackup
 
         private void RunBackup(object obj)
         {
-            var device = obj as USBDeviceNotificationWrapper;
-            if (device != null)
-            {
-                _backupHandler.HandleBackup(device);
-                return;
-            }
             var drive = obj as DriveNotificationWrapper;
             if (drive != null)
             {

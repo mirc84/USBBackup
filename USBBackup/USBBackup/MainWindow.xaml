@@ -25,73 +25,54 @@
         
         <ItemsControl Margin="10" Grid.Row="1" ItemsSource="{Binding UsbDevices}" Grid.IsSharedSizeScope="True" >
             <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="local:USBDeviceNotificationWrapper">
-                    <Expander IsExpanded="True">
+                <DataTemplate DataType="local:DriveNotificationWrapper">
+                    <Expander IsExpanded="True" Margin="10,4,4,4">
                         <Expander.Header>
-                            <Grid HorizontalAlignment="Stretch">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition SharedSizeGroup="Id" Width="Auto"></ColumnDefinition>
-                                    <ColumnDefinition SharedSizeGroup="Description" Width="*"></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding USBDevice.DeviceID}"></TextBlock>
-                                <TextBox Grid.Column="1" Text="{Binding USBDevice.Description, Mode=TwoWay}"></TextBox>
-                            </Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Margin="4" Text="{Binding DriveLetter}"></TextBlock>
+                                <TextBlock Margin="4" Text="{Binding VolumeName}"></TextBlock>
+                            </StackPanel>
                         </Expander.Header>
-
-                        <ItemsControl ItemsSource="{Binding Drives}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate DataType="local:DriveNotificationWrapper">
-                                    <Expander IsExpanded="True" Margin="10,4,4,4">
-                                        <Expander.Header>
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Margin="4" Text="{Binding DriveLetter}"></TextBlock>
-                                                <TextBlock Margin="4" Text="{Binding VolumeName}"></TextBlock>
-                                            </StackPanel>
-                                        </Expander.Header>
-                                        <StackPanel>
-                                            <Button Content="Run" 
+                        <StackPanel IsEnabled="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Expander}, Path=IsAttached}">
+                            <Button Content="Run" 
                                                     Command="{Binding RunBackupCommand}"
                                                     CommandParameter="{Binding }"></Button>
-                                            <ItemsControl ItemsSource="{Binding Backups}">
-                                               <ItemsControl.ItemTemplate>
-                                                   <DataTemplate DataType="local:BackupNotificationWrapper">
-                                                       <Grid>
-                                                           <Grid.ColumnDefinitions>
-                                                               <ColumnDefinition Width="*" />
-                                                                <ColumnDefinition Width="*" />
-                                                                <ColumnDefinition Width="Auto" />
-                                                                <ColumnDefinition Width="Auto" />
-                                                           </Grid.ColumnDefinitions>
-                                                           <Grid.RowDefinitions>
-                                                               <RowDefinition Height="*" />
-                                                               <RowDefinition Height="*" />
-                                                           </Grid.RowDefinitions>
+                            <ItemsControl ItemsSource="{Binding Backups}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="local:BackupNotificationWrapper">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="*" />
+                                            </Grid.RowDefinitions>
 
-                                                           <TextBlock Text="Source"></TextBlock>
-                                                           <controls:FolderBrowseControl Grid.Row="1" Grid.Column="0"
+                                            <TextBlock Text="Source"></TextBlock>
+                                            <controls:FolderBrowseControl Grid.Row="1" Grid.Column="0"
                                                                                          SelectedPath="{Binding SourcePath, Mode=TwoWay}" />
-                                                           <TextBlock Grid.Row="0" Grid.Column="1" Text="Target"></TextBlock>
-                                                           <controls:FolderBrowseControl Grid.Row="1" Grid.Column="1"
+                                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Target"></TextBlock>
+                                            <controls:FolderBrowseControl Grid.Row="1" Grid.Column="1"
                                                                                          SelectedPath="{Binding TargetPath, Mode=TwoWay}"/>
 
-                                                            <CheckBox Margin="4" Grid.Row="1" Grid.Column="2"
+                                            <CheckBox Margin="4" Grid.Row="1" Grid.Column="2"
                                                                       IsChecked="{Binding IsEnabled, Mode=TwoWay}"/>
-                                                            <Button Margin="4" Content="Run" Grid.Row="1" Grid.Column="3"
+                                            <Button Margin="4" Content="Run" Grid.Row="1" Grid.Column="3"
                                                                     Command="{Binding RunBackupCommand}"
                                                                     CommandParameter="{Binding }"></Button>
-                                                        </Grid>
-                                                   </DataTemplate>
-                                               </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
 
-                                            <Button Content="Add" 
+                            <Button Content="Add" 
                                                     Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.AddBackupCommand}"
                                                     CommandParameter="{Binding }"></Button>
-                                        </StackPanel>
-                                    </Expander>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        </StackPanel>
                     </Expander>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
