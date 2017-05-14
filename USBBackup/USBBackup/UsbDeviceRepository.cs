@@ -51,10 +51,13 @@ namespace USBBackup
         private void OnUSBDeviceAttached(USBDevice attachedUSBDevice)
         {
             var existingDevice = USBDevices.FirstOrDefault(x => x.DeviceID == attachedUSBDevice.DeviceID);
-            if (existingDevice == null && attachedUSBDevice.Drives.Any())
+            if (existingDevice == null)
             {
-                _dispatcher.Invoke(() => USBDevices.Add(attachedUSBDevice));
-                OnUSBDevicesChanged();
+                if (attachedUSBDevice.Drives.Any())
+                {
+                    _dispatcher.Invoke(() => USBDevices.Add(attachedUSBDevice));
+                    OnUSBDevicesChanged();
+                }
                 return;
             }
 

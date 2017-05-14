@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using USBBackup.Entities;
@@ -9,6 +11,15 @@ namespace USBBackup
 {
     internal class BackupHandler
     {
+        private CancellationTokenSource _cancellationToken;
+        private Dictionary<IBackup, Task> _tasks;
+
+        public BackupHandler()
+        {
+            _cancellationToken = new CancellationTokenSource();
+            _tasks = new Dictionary<IBackup, Task>();
+        }
+
         public void HandleBackup(USBDeviceNotificationWrapper usbDeviceInfo)
         {
             foreach (var drive in usbDeviceInfo.Drives)
@@ -27,6 +38,18 @@ namespace USBBackup
 
         internal void HandleBackup(Drive drive)
         {
+            foreach (var backup in drive.Backups)
+            {
+                HandleBackup(backup);
+            }
+        }
+
+        internal void HandleBackup(USBDevice device)
+        {
+            foreach (var drive in device.Drives)
+            {
+                HandleBackup(drive);
+            }
         }
 
         public void HandleBackup(IBackup backup)
@@ -34,7 +57,7 @@ namespace USBBackup
             if (!backup.IsEnabled || backup.IsRunning)
                 return;
 
-            Task.Factory.StartNew(() =>
+            var task = Task.Factory.StartNew(() =>
             {
                 try
                 {
@@ -45,6 +68,9 @@ namespace USBBackup
 
                     foreach (var fileInfo in dir.EnumerateFiles())
                     {
+                        if (_cancellationToken.IsCancellationRequested)
+                            return;
+
                         try
                         {
                             var relativePath = fileInfo.FullName.Substring(backup.SourcePath.Length);
@@ -54,9 +80,14 @@ namespace USBBackup
                                 continue;
 
                             var targetPath = targetFileInfo.FullName;
-                            File.Copy(fileInfo.FullName, targetPath + ".bak");
+                            var bakPath = targetPath + ".bak";
+                            if (File.Exists(bakPath))
+                                File.Delete(bakPath);
+                            File.Copy(fileInfo.FullName, bakPath);
+
                             if (File.Exists(targetPath))
                                 File.Delete(targetPath);
+
                             File.Move(targetPath + ".bak", targetPath);
                         }
                         catch (Exception e)
@@ -76,7 +107,20 @@ namespace USBBackup
                 {
                     backup.IsRunning = false;
                 }
+            }, _cancellationToken.Token);
+
+            _tasks.Add(backup, task);
+            task.ContinueWith(_ =>
+            {
+                _tasks.Remove(backup);
             });
+        }
+
+        internal void CancelBackups()
+        {
+            _cancellationToken.Cancel();
+            foreach (var task in _tasks.Values.ToList())
+                task.Wait();
         }
     }
 }

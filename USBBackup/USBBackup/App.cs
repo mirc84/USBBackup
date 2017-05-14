@@ -26,9 +26,9 @@ namespace USBBackup
 
         private void Start()
         {
-            _backupHandler = new BackupHandler();
             _watcher = new USBWatcher();
             _watcher.Init();
+            _backupHandler = new BackupHandler();
             _databaseContext = new DatabaseConnection("backup.db");
             _deviceRepository = new UsbDeviceRepository(_watcher, _databaseContext, _backupHandler, Dispatcher.CurrentDispatcher);
             _deviceRepository.Load();
@@ -36,8 +36,10 @@ namespace USBBackup
             _viewModel = new MainWindowViewModel(_deviceRepository, _backupHandler);
             _window = new MainWindow()
             {
-                DataContext = _viewModel
+                DataContext = _viewModel,                
             };
+            _window.WindowState = System.Windows.WindowState.Minimized;
+            _window.ShowInTaskbar = false;
             _window.Closed += Shutdown;
 
             var trayIcon = new TrayIcon(_window);
@@ -49,9 +51,9 @@ namespace USBBackup
             _viewModel.RunAllBackupsCommand.Execute(null);
         }
 
-        private static void Shutdown(object sender, EventArgs eventArgs)
+        private void Shutdown(object sender, EventArgs eventArgs)
         {
-
+            _backupHandler.CancelBackups();
         }
     }
 }

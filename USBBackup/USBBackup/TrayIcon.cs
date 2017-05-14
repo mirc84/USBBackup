@@ -25,7 +25,7 @@ namespace USBBackup
 
             _icon.DoubleClick += OnIconDoubleClick;
             _window.StateChanged += OnWindowStateChanged;
-            _lastState = _window.WindowState;
+            _lastState = WindowState.Normal;
         }
 
         public event EventHandler RunBackupRequested;
