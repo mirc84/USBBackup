@@ -51,9 +51,9 @@ namespace USBBackup
             _viewModel.RunAllBackupsCommand.Execute(null);
         }
 
-        private static void Shutdown(object sender, EventArgs eventArgs)
+        private void Shutdown(object sender, EventArgs eventArgs)
         {
-
+            _backupHandler.CancelBackups();
         }
     }
 }

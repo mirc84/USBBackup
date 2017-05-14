@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using USBBackup.Entities;
@@ -9,6 +11,15 @@ namespace USBBackup
 {
     internal class BackupHandler
     {
+        private CancellationTokenSource _cancellationToken;
+        private Dictionary<IBackup, Task> _tasks;
+
+        public BackupHandler()
+        {
+            _cancellationToken = new CancellationTokenSource();
+            _tasks = new Dictionary<IBackup, Task>();
+        }
+
         public void HandleBackup(USBDeviceNotificationWrapper usbDeviceInfo)
         {
             foreach (var drive in usbDeviceInfo.Drives)
@@ -46,7 +57,7 @@ namespace USBBackup
             if (!backup.IsEnabled || backup.IsRunning)
                 return;
 
-            Task.Factory.StartNew(() =>
+            var task = Task.Factory.StartNew(() =>
             {
                 try
                 {
@@ -57,6 +68,9 @@ namespace USBBackup
 
                     foreach (var fileInfo in dir.EnumerateFiles())
                     {
+                        if (_cancellationToken.IsCancellationRequested)
+                            return;
+
                         try
                         {
                             var relativePath = fileInfo.FullName.Substring(backup.SourcePath.Length);
@@ -93,7 +107,20 @@ namespace USBBackup
                 {
                     backup.IsRunning = false;
                 }
+            }, _cancellationToken.Token);
+
+            _tasks.Add(backup, task);
+            task.ContinueWith(_ =>
+            {
+                _tasks.Remove(backup);
             });
+        }
+
+        internal void CancelBackups()
+        {
+            _cancellationToken.Cancel();
+            foreach (var task in _tasks.Values.ToList())
+                task.Wait();
         }
     }
 }
