@@ -10,21 +10,16 @@ namespace USBBackup
         private UsbDeviceRepository _deviceRepository;
         private DatabaseConnection _databaseContext;
         private BackupHandler _backupHandler;
+        private static MainWindow _window;
+        private MainWindowViewModel _viewModel;
 
         [STAThread]
         public static int Main(params string[] args)
         {
             var app = new App();
             app.Start();
-            var viewModel = new MainWindowViewModel(app._deviceRepository, app._backupHandler);
-            var window = new MainWindow()
-            {
-                DataContext = viewModel
-            };
-            window.Closed += Shutdown;
 
-            var trayIcon = new TrayIcon(window);
-            window.ShowDialog();
+            _window.ShowDialog();
 
             return 0;
         }
@@ -34,9 +29,24 @@ namespace USBBackup
             _backupHandler = new BackupHandler();
             _watcher = new USBWatcher();
             _watcher.Init();
-            _databaseContext = new DatabaseConnection("db.db");
+            _databaseContext = new DatabaseConnection("backup.db");
             _deviceRepository = new UsbDeviceRepository(_watcher, _databaseContext, _backupHandler, Dispatcher.CurrentDispatcher);
             _deviceRepository.Load();
+
+            _viewModel = new MainWindowViewModel(_deviceRepository, _backupHandler);
+            _window = new MainWindow()
+            {
+                DataContext = _viewModel
+            };
+            _window.Closed += Shutdown;
+
+            var trayIcon = new TrayIcon(_window);
+            trayIcon.RunBackupRequested += OnRunBackupRequested;
+        }
+
+        private void OnRunBackupRequested(object sender, EventArgs e)
+        {
+            _viewModel.RunAllBackupsCommand.Execute(null);
         }
 
         private static void Shutdown(object sender, EventArgs eventArgs)
