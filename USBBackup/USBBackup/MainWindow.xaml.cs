@@ -47,16 +47,16 @@ namespace USBBackup
             if (element == null)
                 return;
 
-            var backupInfo = element.DataContext as BackupInfo;
+            var backupInfo = element.DataContext as Backup;
             if (backupInfo == null)
             {
                 element = element.FindAncestor<DataGridRow>();
-                var device = element?.DataContext as USBDeviceInfo;
+                var device = element?.DataContext as USBDevice;
                 if (device == null)
                     return;
 
-                backupInfo = new BackupInfo();
-                device.Backups.Add(backupInfo);
+                //backupInfo = new Backup();
+                //device.Drives.Add(backupInfo);
             }
 
             var dialog = new VistaFolderBrowserDialog {SelectedPath = backupInfo.SourcePath};
@@ -68,7 +68,7 @@ namespace USBBackup
 
         private void TargetButton_OnClick(object sender, RoutedEventArgs e)
         {
-            var backupInfo = (sender as FrameworkElement)?.DataContext as BackupInfo;
+            var backupInfo = (sender as FrameworkElement)?.DataContext as Backup;
             if (backupInfo == null)
                 return;
 

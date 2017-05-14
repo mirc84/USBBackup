@@ -107,17 +107,16 @@
     </Compile>
     <Compile Include="Core\NotificationObject.cs" />
     <Compile Include="Core\RelayCommand.cs" />
-    <Compile Include="DatabaseAccess\DatabaseContext.cs" />
-    <Compile Include="DatabaseAccess\DatabaseConfiguration.cs" />
     <Compile Include="DatabaseAccess\DatabaseConnection.cs" />
-    <Compile Include="Entities\BackupInfo.cs" />
+    <Compile Include="Entities\Backup.cs" />
     <Compile Include="Entities\DatabaseModel.cs" />
-    <Compile Include="Entities\USBDeviceInfo.cs" />
-    <Compile Include="Lib\NotificationObject.cs" />
-    <Compile Include="Lib\RelayCommand.cs" />
+    <Compile Include="Entities\Drive.cs" />
+    <Compile Include="Entities\USBDevice.cs" />
+    <Compile Include="IBackup.cs" />
     <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="TrayIcon.cs" />
     <Compile Include="UIElementExtension.cs" />
+    <Compile Include="NotificationWrapper.cs" />
     <Compile Include="UsbDeviceRepository.cs" />
     <Compile Include="USBWatcher.cs" />
     <Page Include="Controls\FolderBrowseControl.xaml">

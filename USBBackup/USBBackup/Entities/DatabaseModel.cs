@@ -1,14 +1,13 @@
 ﻿using FluentNHibernate.Mapping;
 using System;
-using USBBackup.Core;
 
 namespace USBBackup.Entities
 {
-    public abstract class DatabaseModel : NotificationObject
+    public abstract class DatabaseModel
     {
-        public Guid Id { get; set; }
+        public virtual Guid Id { get; set; }
 
-        public void SetId()
+        public virtual void SetId()
         {
             if (Id == Guid.Empty)
                 Id = Guid.NewGuid();

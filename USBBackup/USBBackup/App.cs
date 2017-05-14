@@ -8,7 +8,7 @@ namespace USBBackup
     {
         private USBWatcher _watcher;
         private UsbDeviceRepository _deviceRepository;
-        private DatabaseContext _databaseContext;
+        private DatabaseConnection _databaseContext;
         private BackupHandler _backupHandler;
 
         [STAThread]
@@ -16,7 +16,7 @@ namespace USBBackup
         {
             var app = new App();
             app.Start();
-            var viewModel = new MainWindowViewModel(app._deviceRepository);
+            var viewModel = new MainWindowViewModel(app._deviceRepository, app._backupHandler);
             var window = new MainWindow()
             {
                 DataContext = viewModel
@@ -34,9 +34,9 @@ namespace USBBackup
             _backupHandler = new BackupHandler();
             _watcher = new USBWatcher();
             _watcher.Init();
-            _databaseContext = new DatabaseContext();
+            _databaseContext = new DatabaseConnection("db.db");
             _deviceRepository = new UsbDeviceRepository(_watcher, _databaseContext, _backupHandler, Dispatcher.CurrentDispatcher);
-            _deviceRepository.Init();
+            _deviceRepository.Load();
         }
 
         private static void Shutdown(object sender, EventArgs eventArgs)
