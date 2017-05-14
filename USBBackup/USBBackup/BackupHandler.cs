@@ -27,6 +27,18 @@ namespace USBBackup
 
         internal void HandleBackup(Drive drive)
         {
+            foreach (var backup in drive.Backups)
+            {
+                HandleBackup(backup);
+            }
+        }
+
+        internal void HandleBackup(USBDevice device)
+        {
+            foreach (var drive in device.Drives)
+            {
+                HandleBackup(drive);
+            }
         }
 
         public void HandleBackup(IBackup backup)
@@ -54,9 +66,14 @@ namespace USBBackup
                                 continue;
 
                             var targetPath = targetFileInfo.FullName;
-                            File.Copy(fileInfo.FullName, targetPath + ".bak");
+                            var bakPath = targetPath + ".bak";
+                            if (File.Exists(bakPath))
+                                File.Delete(bakPath);
+                            File.Copy(fileInfo.FullName, bakPath);
+
                             if (File.Exists(targetPath))
                                 File.Delete(targetPath);
+
                             File.Move(targetPath + ".bak", targetPath);
                         }
                         catch (Exception e)
