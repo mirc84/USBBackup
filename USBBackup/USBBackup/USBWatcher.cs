@@ -6,20 +6,20 @@ using USBBackup.Entities;
 
 namespace USBBackup
 {
-    internal delegate void USBDeviceAttachedHandler(Drive deviceInfo);
+    internal delegate void DriveAttachedHandler(Drive deviceInfo);
 
     internal class USBWatcher : NotificationObject
     {
         private ManagementEventWatcher _changedWatcher;
-        private IList<Drive> _drives;
+        private readonly IList<Drive> _drives;
 
         public USBWatcher()
         {
             _drives = new List<Drive>();
         }
 
-        public event USBDeviceAttachedHandler DeviceAttached;
-        public event USBDeviceAttachedHandler DeviceDetached;
+        public event DriveAttachedHandler DriveAttached;
+        public event DriveAttachedHandler DriveDetached;
 
         public void Init()
         {
@@ -31,8 +31,6 @@ namespace USBBackup
 
         private void OnVolumeChangeEvent(object sender, EventArrivedEventArgs e)
         {
-            var porps = e.NewEvent.Properties.Cast<PropertyData>().ToDictionary(x => x.Name, x => x.Value);
-            
             switch ((ushort)e.NewEvent["EventType"])
             {
                 case 2: // added
@@ -48,7 +46,7 @@ namespace USBBackup
 
         private void OnVolumeAttached(string driveLetter)
         {
-            var drive = LoadUSBDevices(driveLetter);
+            var drive = LoadDrives(driveLetter).FirstOrDefault();
             if (drive == null)
                 return;
             
@@ -64,72 +62,72 @@ namespace USBBackup
             OnDeviceDetached(drive);
         }
 
-        public IEnumerable<Drive> LoadUSBDevices()
+        public IEnumerable<Drive> LoadDrives(string driveLetter = null)
         {
-            ManagementObjectCollection collection;
-            using (var searcher = new ManagementObjectSearcher(@"Select * From Win32_LogicalDisk"))
-            {
-                collection = searcher.Get();
-            }
+            var query = "SELECT * FROM Win32_Volume";
+            if (driveLetter != null)
+                query += $" WHERE VolumeLetter='{driveLetter}'";
 
-            foreach (var item in collection.OfType<ManagementObject>().Where(x => (uint)x["DriveType"] < 5))
+            var searcher = new ManagementObjectSearcher(query).Get();
+            foreach (ManagementObject item in searcher)
             {
-                var drive = CreateUSBDeviceInfo(item);
-                if (string.IsNullOrEmpty(drive.DriveLetter))
-                    continue;
-                _drives.Add(drive);
-                yield return drive;
+                Drive drive = null;
+                try
+                {
+                    driveLetter = (string)item["DriveLetter"];
+                    if (string.IsNullOrEmpty(driveLetter))
+                        continue;
+
+                    var driveObject = GetDiskVolume(driveLetter);
+                    drive = new Drive
+                    {
+                        DriveLetter = driveLetter,
+                        DeviceID = (string)item["DeviceID"],
+                        FreeSpace = (ulong)item["FreeSpace"],
+                        Name = (string)driveObject["Name"],
+                        Model = (string)driveObject["Model"],
+                        PNPDeviceID = (string)driveObject["PNPDeviceID"]
+                    };
+                    _drives.Add(drive);
+                }
+                catch (System.Exception e)
+                {
+                    continue;                    
+                }
+                if (drive != null)
+                    yield return drive;
             }
         }
 
-        public Drive LoadUSBDevices(string driveLetter)
+        private ManagementObject GetDiskVolume(string volumeLetter)
         {
-            if (string.IsNullOrEmpty(driveLetter))
-                return null;
-
-            ManagementObjectCollection collection;
-            using (var searcher = new ManagementObjectSearcher($"Select * From Win32_LogicalDisk Where Name = '{driveLetter}'"))
+            var collection = new ManagementObjectSearcher($"ASSOCIATORS OF {{Win32_LogicalDisk.DeviceID='{volumeLetter}'}} WHERE AssocClass=Win32_LogicalDiskToPartition").Get();
+            foreach (ManagementObject item in collection)
             {
-                collection = searcher.Get();
+                var associators = new ManagementObjectSearcher($"ASSOCIATORS OF {{Win32_DiskPartition.DeviceID='{item["DeviceID"]}'}}").Get();
+                foreach (ManagementObject associator in associators)
+                {
+                    if (associator["CreationClassName"].ToString() != "Win32_DiskDrive")
+                        continue;
+
+                    var drives = new ManagementObjectSearcher($"SELECT * FROM Win32_DiskDrive WHERE DeviceID='{associator["DeviceID"].ToString().Replace(@"\", @"\\")}'").Get();
+                    foreach (ManagementObject diskVolume in drives)
+                    {
+                        return diskVolume;
+                    }
+                }
             }
-
-            var drive = CreateUSBDeviceInfo(collection.OfType<ManagementBaseObject>().First());
-            _drives.Add(drive);
-            return drive;
+            return null;
         }
-
-        //public IEnumerable<Drive> LoadUSBDevices(string deviceID)
-        //{
-        //    ManagementObjectCollection collection;
-        //    using (var searcher = new ManagementObjectSearcher($"Select * From Win32_USBHub WHERE DeviceID='{deviceID.Replace("\\","\\\\")}'"))
-        //    {
-        //        collection = searcher.Get();
-        //    }
-
-        //    foreach (var item in collection.OfType<ManagementObject>())
-        //    {
-        //        yield return CreateUSBDeviceInfo(item);
-        //    }
-        //}
 
         protected virtual void OnDeviceAttached(Drive deviceInfo)
         {
-            DeviceAttached?.Invoke(deviceInfo);
+            DriveAttached?.Invoke(deviceInfo);
         }
 
         protected virtual void OnDeviceDetached(Drive deviceInfo)
         {
-            DeviceDetached?.Invoke(deviceInfo);
-        }
-        
-        private static Drive CreateUSBDeviceInfo(ManagementBaseObject volume)
-        {
-            var porps = volume.Properties.Cast<PropertyData>().ToDictionary(x => x.Name, x => x.Value);
-
-            var volumeSerialNumber = volume["VolumeSerialNumber"].ToString();
-            var driveLetter = volume["Name"].ToString();
-            var name = volume["VolumeName"].ToString();
-            return new Drive(driveLetter, name, volumeSerialNumber);
+            DriveDetached?.Invoke(deviceInfo);
         }
     }
 }

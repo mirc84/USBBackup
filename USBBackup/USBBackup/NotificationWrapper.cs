@@ -33,7 +33,7 @@ namespace USBBackup
 
         public string DriveLetter => _drive.DriveLetter;
 
-        public string VolumeName => _drive.VolumeName;
+        public string VolumeName => _drive.Name;
     }
 
     public class BackupNotificationWrapper : NotificationObject, IBackup

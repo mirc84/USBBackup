@@ -35,12 +35,12 @@ namespace USBBackup
             foreach (var usbDeviceInfo in usbDevices)
                 USBDevices.Add(usbDeviceInfo);
 
-            var attachedUSBDevices = _watcher.LoadUSBDevices().ToList();
+            var attachedUSBDevices = _watcher.LoadDrives().ToList();
             foreach (var attachedUSBDevice in attachedUSBDevices)
-                OnUSBDeviceAttached(attachedUSBDevice);
+                OnUSBDriveAttached(attachedUSBDevice);
 
-            _watcher.DeviceAttached += OnUSBDeviceAttached;
-            _watcher.DeviceDetached += OnUSBDeviceDetached;
+            _watcher.DriveAttached += OnUSBDriveAttached;
+            _watcher.DriveDetached += OnUSBDriveDetached;
         }
 
         public void Save()
@@ -48,9 +48,9 @@ namespace USBBackup
             _databaseConncetion.SaveDevices(USBDevices);
         }
 
-        private void OnUSBDeviceAttached(Drive drive)
+        private void OnUSBDriveAttached(Drive drive)
         {
-            var existingDevice = USBDevices.FirstOrDefault(x => x.VolumeSerialNumber == drive.VolumeSerialNumber);
+            var existingDevice = USBDevices.FirstOrDefault(x => x.DeviceID == drive.DeviceID && x.PNPDeviceID == drive.PNPDeviceID);
             if (existingDevice == null)
             {
                 _dispatcher.Invoke(() => USBDevices.Add(drive));
@@ -61,7 +61,7 @@ namespace USBBackup
 
             existingDevice.IsAttached = true;
             existingDevice.DriveLetter = drive.DriveLetter;
-            existingDevice.VolumeName = drive.VolumeName;
+            existingDevice.Name = drive.Name;
             existingDevice.UpdateBackupPaths();
             OnExistingDriveAttached(drive);
         }
@@ -71,9 +71,9 @@ namespace USBBackup
             _backupHandler.HandleBackup(existingDrive);
         }
 
-        private void OnUSBDeviceDetached(Drive attachedUSBDevice)
+        private void OnUSBDriveDetached(Drive attachedUSBDevice)
         {
-            var existingDevice = USBDevices.FirstOrDefault(x => x.VolumeSerialNumber == attachedUSBDevice.VolumeSerialNumber);
+            var existingDevice = USBDevices.FirstOrDefault(x => x.DeviceID == attachedUSBDevice.DeviceID && x.PNPDeviceID == attachedUSBDevice.PNPDeviceID);
             if (existingDevice == null)
                 return;
 
