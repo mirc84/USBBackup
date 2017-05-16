@@ -6,19 +6,6 @@ using USBBackup.Entities;
 
 namespace USBBackup
 {
-    public class USBDeviceNotificationWrapper : NotificationObject
-    {
-        public USBDevice USBDevice { get; }
-
-        public USBDeviceNotificationWrapper(USBDevice usbDevice)
-        {
-            USBDevice = usbDevice;
-            Drives = new ObservableCollection<DriveNotificationWrapper>(usbDevice.Drives.Select(x => new DriveNotificationWrapper(x)).ToList());
-        }
-
-        public ObservableCollection<DriveNotificationWrapper> Drives { get; set; }
-    }
-
     public class DriveNotificationWrapper : NotificationObject
     {
         private readonly Drive _drive;
@@ -46,7 +33,7 @@ namespace USBBackup
 
         public string DriveLetter => _drive.DriveLetter;
 
-        public string VolumeName => _drive.VolumeName;
+        public string VolumeName => _drive.Name;
     }
 
     public class BackupNotificationWrapper : NotificationObject, IBackup

@@ -51,7 +51,7 @@ namespace USBBackup
             if (backupInfo == null)
             {
                 element = element.FindAncestor<DataGridRow>();
-                var device = element?.DataContext as USBDevice;
+                var device = element?.DataContext as Drive;
                 if (device == null)
                     return;
 

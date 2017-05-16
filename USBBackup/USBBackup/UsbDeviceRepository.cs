@@ -22,25 +22,25 @@ namespace USBBackup
             _backupHandler = backupHandler;
             _dispatcher = dispatcher;
 
-            USBDevices = new ObservableCollection<USBDevice>();
+            USBDevices = new ObservableCollection<Drive>();
         }
 
-        public IList<USBDevice> USBDevices { get; }
+        public IList<Drive> USBDevices { get; }
 
         public event EventHandler USBDevicesChanged;
 
         public void Load()
         {
-            var usbDevices = _databaseConncetion.GetAll<USBDevice>();
+            var usbDevices = _databaseConncetion.GetAll<Drive>();
             foreach (var usbDeviceInfo in usbDevices)
                 USBDevices.Add(usbDeviceInfo);
 
-            var attachedUSBDevices = _watcher.LoadUSBDevices().ToList();
+            var attachedUSBDevices = _watcher.LoadDrives().ToList();
             foreach (var attachedUSBDevice in attachedUSBDevices)
-                OnUSBDeviceAttached(attachedUSBDevice);
+                OnUSBDriveAttached(attachedUSBDevice);
 
-            _watcher.DeviceAttached += OnUSBDeviceAttached;
-            _watcher.DeviceDetached += OnUSBDeviceDetached;
+            _watcher.DriveAttached += OnUSBDriveAttached;
+            _watcher.DriveDetached += OnUSBDriveDetached;
         }
 
         public void Save()
@@ -48,40 +48,22 @@ namespace USBBackup
             _databaseConncetion.SaveDevices(USBDevices);
         }
 
-        private void OnUSBDeviceAttached(USBDevice attachedUSBDevice)
+        private void OnUSBDriveAttached(Drive drive)
         {
-            var existingDevice = USBDevices.FirstOrDefault(x => x.DeviceID == attachedUSBDevice.DeviceID);
+            var existingDevice = USBDevices.FirstOrDefault(x => x.DeviceID == drive.DeviceID && x.PNPDeviceID == drive.PNPDeviceID);
             if (existingDevice == null)
             {
-                if (attachedUSBDevice.Drives.Any())
-                {
-                    _dispatcher.Invoke(() => USBDevices.Add(attachedUSBDevice));
-                    OnUSBDevicesChanged();
-                }
+                _dispatcher.Invoke(() => USBDevices.Add(drive));
+                OnUSBDevicesChanged();
+
                 return;
             }
 
             existingDevice.IsAttached = true;
-            existingDevice.ManagementObject = attachedUSBDevice.ManagementObject;
-            foreach (var drive in existingDevice.Drives)
-            {
-                var attachedDrive =
-                    attachedUSBDevice.Drives.FirstOrDefault(x => x.VolumeSerialNumber == drive.VolumeSerialNumber);
-                if (attachedDrive == null)
-                {
-                    continue;
-                }
-
-                drive.DriveLetter = attachedDrive.DriveLetter;
-                drive.VolumeName = attachedDrive.VolumeName;
-                OnExistingDriveAttached(drive);
-            }
-            foreach (var drive in attachedUSBDevice.Drives.Where(x => existingDevice.Drives.All(y => y.VolumeSerialNumber != x.VolumeSerialNumber)))
-            {
-                existingDevice.Drives.Add(drive);
-            }
-
-            OnUSBDevicesChanged();
+            existingDevice.DriveLetter = drive.DriveLetter;
+            existingDevice.Name = drive.Name;
+            existingDevice.UpdateBackupPaths();
+            OnExistingDriveAttached(drive);
         }
 
         private void OnExistingDriveAttached(Drive existingDrive)
@@ -89,14 +71,14 @@ namespace USBBackup
             _backupHandler.HandleBackup(existingDrive);
         }
 
-        private void OnUSBDeviceDetached(USBDevice attachedUSBDevice)
+        private void OnUSBDriveDetached(Drive attachedUSBDevice)
         {
-            var existingDevice = USBDevices.FirstOrDefault(x => x.DeviceID == attachedUSBDevice.DeviceID);
+            var existingDevice = USBDevices.FirstOrDefault(x => x.DeviceID == attachedUSBDevice.DeviceID && x.PNPDeviceID == attachedUSBDevice.PNPDeviceID);
             if (existingDevice == null)
                 return;
 
             existingDevice.IsAttached = false;
-            if (existingDevice.Drives == null || !existingDevice.Drives.Any())
+            if (existingDevice.Backups == null || !existingDevice.Backups.Any())
                 _dispatcher.Invoke(() => USBDevices.Remove(existingDevice));
 
             OnUSBDevicesChanged();

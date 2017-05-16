@@ -19,15 +19,7 @@ namespace USBBackup
             _cancellationToken = new CancellationTokenSource();
             _tasks = new Dictionary<IBackup, Task>();
         }
-
-        public void HandleBackup(USBDeviceNotificationWrapper usbDeviceInfo)
-        {
-            foreach (var drive in usbDeviceInfo.Drives)
-            {
-                HandleBackup(drive);
-            }
-        }
-
+        
         public void HandleBackup(DriveNotificationWrapper existingDevice)
         {
             foreach (var backup in existingDevice.Backups)
@@ -43,15 +35,7 @@ namespace USBBackup
                 HandleBackup(backup);
             }
         }
-
-        internal void HandleBackup(USBDevice device)
-        {
-            foreach (var drive in device.Drives)
-            {
-                HandleBackup(drive);
-            }
-        }
-
+        
         public void HandleBackup(IBackup backup)
         {
             if (!backup.IsEnabled || backup.IsRunning)
