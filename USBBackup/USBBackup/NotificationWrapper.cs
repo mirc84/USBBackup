@@ -33,7 +33,19 @@ namespace USBBackup
 
         public string DriveLetter => _drive.DriveLetter;
 
+        public string Model => _drive.Model;
+
         public string VolumeName => _drive.Name;
+
+        public bool IsAttached
+        {
+            get { return _drive.IsAttached; }
+            set
+            {
+                _drive.IsAttached = value;
+                OnPropertyChanged();
+            }
+        }
     }
 
     public class BackupNotificationWrapper : NotificationObject, IBackup

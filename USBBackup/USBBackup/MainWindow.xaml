@@ -30,13 +30,13 @@
                         <Expander.Header>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Margin="4" Text="{Binding DriveLetter}"></TextBlock>
-                                <TextBlock Margin="4" Text="{Binding VolumeName}"></TextBlock>
+                                <TextBlock Margin="4" Text="{Binding Model}"></TextBlock>
                             </StackPanel>
                         </Expander.Header>
-                        <StackPanel IsEnabled="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Expander}, Path=IsAttached}">
+                        <StackPanel IsEnabled="{Binding IsAttached}">
                             <Button Content="Run" 
-                                                    Command="{Binding RunBackupCommand}"
-                                                    CommandParameter="{Binding }"></Button>
+                                    Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.RunBackupCommand}"
+                                    CommandParameter="{Binding }"></Button>
                             <ItemsControl ItemsSource="{Binding Backups}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="local:BackupNotificationWrapper">
@@ -46,24 +46,34 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="*" />
                                                 <RowDefinition Height="*" />
                                             </Grid.RowDefinitions>
-
+                                            
                                             <TextBlock Text="Source"></TextBlock>
                                             <controls:FolderBrowseControl Grid.Row="1" Grid.Column="0"
-                                                                                         SelectedPath="{Binding SourcePath, Mode=TwoWay}" />
+                                                                          PathRestriction="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Expander}, Path=DataContext.DriveLetter}"
+                                                                          SelectedPath="{Binding SourcePath, Mode=TwoWay}" />
                                             <TextBlock Grid.Row="0" Grid.Column="1" Text="Target"></TextBlock>
                                             <controls:FolderBrowseControl Grid.Row="1" Grid.Column="1"
-                                                                                         SelectedPath="{Binding TargetPath, Mode=TwoWay}"/>
+                                                                          SelectedPath="{Binding TargetPath, Mode=TwoWay}"/>
 
                                             <CheckBox Margin="4" Grid.Row="1" Grid.Column="2"
-                                                                      IsChecked="{Binding IsEnabled, Mode=TwoWay}"/>
+                                                      IsChecked="{Binding IsEnabled, Mode=TwoWay}"/>
                                             <Button Margin="4" Content="Run" Grid.Row="1" Grid.Column="3"
-                                                                    Command="{Binding RunBackupCommand}"
-                                                                    CommandParameter="{Binding }"></Button>
+                                                    Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.RunBackupCommand}"
+                                                    CommandParameter="{Binding }"></Button>
+                                            <Button Margin="4" Content="Remove" Grid.Row="1" Grid.Column="4"
+                                                    Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.RemoveBackupCommand}"
+                                                    CommandParameter="{Binding }"></Button>
+                                            <Button Margin="4" Content="Cancel" Grid.Row="1" Grid.Column="5"
+                                                    IsEnabled="{Binding IsRunning}"
+                                                    Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.CancelBackupCommand}"
+                                                    CommandParameter="{Binding }"></Button>
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
