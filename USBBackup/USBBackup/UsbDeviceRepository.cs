@@ -58,6 +58,7 @@ namespace USBBackup
 
         private void OnDirDeleted(Backup backup, FileSystemEventArgs f)
         {
+            _backupHandler.RecycleBackupFiles(backup);
         }
 
         private void OnDirChanged(Backup backup, FileSystemEventArgs f)
@@ -92,6 +93,8 @@ namespace USBBackup
         private void OnExistingDriveAttached(Drive existingDrive)
         {
             _backupHandler.HandleBackup(existingDrive);
+            foreach (var backup in existingDrive.Backups)
+                _backupHandler.RecycleBackupFiles(backup);
         }
 
         private void OnUSBDriveDetached(Drive attachedUSBDevice)
