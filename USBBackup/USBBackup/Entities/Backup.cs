@@ -6,7 +6,6 @@
         public virtual string TargetPath { get; set; }
         public virtual bool IsEnabled { get; set; }
         public virtual bool IsRunning { get; set; }
-
     }
 
     public class BackupInfoMap : DatabaseModelMap<Backup>

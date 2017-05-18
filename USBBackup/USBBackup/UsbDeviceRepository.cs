@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows.Threading;
 using USBBackup.DatabaseAccess;
@@ -8,6 +9,8 @@ using USBBackup.Entities;
 
 namespace USBBackup
 {
+    public delegate void DeviceChangedEventHandler(Drive drive);
+
     internal class UsbDeviceRepository
     {
         private readonly USBWatcher _watcher;
@@ -27,20 +30,39 @@ namespace USBBackup
 
         public IList<Drive> USBDevices { get; }
 
-        public event EventHandler USBDevicesChanged;
+        public event DeviceChangedEventHandler USBDevicesChanged;
 
         public void Load()
         {
             var usbDevices = _databaseConncetion.GetAll<Drive>();
             foreach (var usbDeviceInfo in usbDevices)
+            {
                 USBDevices.Add(usbDeviceInfo);
-
+                foreach (var backup in usbDeviceInfo.Backups)
+                {
+                    var watcher = new FileSystemWatcher(backup.SourcePath);
+                    watcher.EnableRaisingEvents = true;
+                    watcher.IncludeSubdirectories = true;
+                    watcher.Changed += (s, f) => OnDirChanged(backup, f);
+                    watcher.Created += (s, f) => OnDirChanged(backup, f);
+                    watcher.Deleted += (s, f) => OnDirDeleted(backup, f);
+                }
+            }
             var attachedUSBDevices = _watcher.LoadDrives().ToList();
             foreach (var attachedUSBDevice in attachedUSBDevices)
                 OnUSBDriveAttached(attachedUSBDevice);
 
             _watcher.DriveAttached += OnUSBDriveAttached;
             _watcher.DriveDetached += OnUSBDriveDetached;
+        }
+
+        private void OnDirDeleted(Backup backup, FileSystemEventArgs f)
+        {
+        }
+
+        private void OnDirChanged(Backup backup, FileSystemEventArgs f)
+        {
+            _backupHandler.HandleBackup(backup, f.FullPath);
         }
 
         public void Save()
@@ -54,7 +76,7 @@ namespace USBBackup
             if (existingDevice == null)
             {
                 _dispatcher.Invoke(() => USBDevices.Add(drive));
-                OnUSBDevicesChanged();
+                OnUSBDevicesChanged(drive);
 
                 return;
             }
@@ -63,7 +85,8 @@ namespace USBBackup
             existingDevice.DriveLetter = drive.DriveLetter;
             existingDevice.Name = drive.Name;
             existingDevice.UpdateBackupPaths();
-            OnExistingDriveAttached(drive);
+            OnExistingDriveAttached(existingDevice);
+            OnUSBDevicesChanged(existingDevice);
         }
 
         private void OnExistingDriveAttached(Drive existingDrive)
@@ -81,12 +104,12 @@ namespace USBBackup
             if (existingDevice.Backups == null || !existingDevice.Backups.Any())
                 _dispatcher.Invoke(() => USBDevices.Remove(existingDevice));
 
-            OnUSBDevicesChanged();
+            OnUSBDevicesChanged(existingDevice);
         }
 
-        protected virtual void OnUSBDevicesChanged()
+        protected virtual void OnUSBDevicesChanged(Drive drive)
         {
-            USBDevicesChanged?.Invoke(this, EventArgs.Empty);
+            USBDevicesChanged?.Invoke(drive);
         }
     }
 }

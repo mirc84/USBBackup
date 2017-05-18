@@ -58,7 +58,8 @@ namespace USBBackup
             var drive = _drives.FirstOrDefault(x => x.DriveLetter == driveLetter);
             if (drive == null)
                 return;
-            
+
+            _drives.Remove(drive);
             OnDeviceDetached(drive);
         }
 
@@ -66,7 +67,7 @@ namespace USBBackup
         {
             var query = "SELECT * FROM Win32_Volume";
             if (driveLetter != null)
-                query += $" WHERE VolumeLetter='{driveLetter}'";
+                query += $" WHERE DriveLetter='{driveLetter}'";
 
             var searcher = new ManagementObjectSearcher(query).Get();
             foreach (ManagementObject item in searcher)
@@ -79,15 +80,20 @@ namespace USBBackup
                         continue;
 
                     var driveObject = GetDiskVolume(driveLetter);
+                    if (driveObject == null)
+                        continue;
+
                     drive = new Drive
                     {
                         DriveLetter = driveLetter,
+                        IsAttached = true,
                         DeviceID = (string)item["DeviceID"],
                         FreeSpace = (ulong)item["FreeSpace"],
                         Name = (string)driveObject["Name"],
                         Model = (string)driveObject["Model"],
                         PNPDeviceID = (string)driveObject["PNPDeviceID"]
                     };
+
                     _drives.Add(drive);
                 }
                 catch (System.Exception e)

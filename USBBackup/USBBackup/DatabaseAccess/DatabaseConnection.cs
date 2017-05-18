@@ -70,35 +70,17 @@ namespace USBBackup.DatabaseAccess
                 session.Delete(drive);
             }
         }
-//
-//        public void Save<T>(T model)
-//        where T: DatabaseModel
-//        {
-//
-//            if (model.Id == Guid.Empty)
-//                model.Id = Guid.NewGuid();
-//            using (var session = _sessionFactory.OpenSession())
-//            {
-//                session.SaveOrUpdate(model);
-//            }
-//        }
-
-//        public void Save<T>(IEnumerable<T> models)
-//        {
-//            using (var session = _sessionFactory.OpenSession())
-//            {
-//                foreach(var model in models)
-//                    session.SaveOrUpdate(model);
-//            }
-//        }
 
         private ISessionFactory CreateSessionFactory()
         {
-            return Fluently.Configure()
+            var config = Fluently.Configure()
                 .Database(SQLiteConfiguration.Standard.UsingFile(_dbPath))
-                .Mappings(m => m.FluentMappings.AddFromAssemblyOf<DatabaseConnection>())
-                //.ExposeConfiguration(BuildSchema)
-                .BuildSessionFactory();
+                .Mappings(m => m.FluentMappings.AddFromAssemblyOf<DatabaseConnection>());
+
+            if (!File.Exists(_dbPath))
+                config = config.ExposeConfiguration(BuildSchema);
+
+            return config.BuildSessionFactory();
         }
 
         private void BuildSchema(Configuration config)

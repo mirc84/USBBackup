@@ -34,6 +34,13 @@ namespace USBBackup
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             _viewModel = e.NewValue as MainWindowViewModel;
+            _viewModel.UserChoiceRequested += OnUserChoiceRequested;
+        }
+
+        private MessageBoxResult OnUserChoiceRequested(string message, string caption)
+        {
+            var result = MessageBox.Show(message, caption, MessageBoxButton.YesNo);
+            return result;
         }
 
         private void Control_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
