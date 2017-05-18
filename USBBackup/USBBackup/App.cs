@@ -38,7 +38,6 @@ namespace USBBackup
             {
                 DataContext = _viewModel,                
             };
-            _window.WindowState = System.Windows.WindowState.Minimized;
             _window.ShowInTaskbar = false;
             _window.Closed += Shutdown;
 

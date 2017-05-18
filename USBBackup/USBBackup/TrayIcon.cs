@@ -72,6 +72,7 @@ namespace USBBackup
                 return;
             }
 
+            _window.ShowInTaskbar = true;
             _lastState = _window.WindowState;
         }
 
