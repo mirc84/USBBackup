@@ -38,7 +38,7 @@ namespace USBBackup
             foreach (var usbDeviceInfo in usbDevices)
             {
                 USBDevices.Add(usbDeviceInfo);
-                foreach (var backup in usbDeviceInfo.Backups)
+                foreach (var backup in usbDeviceInfo.Backups.Where(x=> x.SourcePath != null && Directory.Exists(x.SourcePath)))
                 {
                     var watcher = new FileSystemWatcher(backup.SourcePath);
                     watcher.EnableRaisingEvents = true;
