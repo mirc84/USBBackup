@@ -26,6 +26,14 @@ namespace USBBackupGUI
             _icon.DoubleClick += OnIconDoubleClick;
             _window.StateChanged += OnWindowStateChanged;
             _lastState = WindowState.Normal;
+
+            _window.Closed += OnClosing;
+        }
+
+        private void OnClosing(object sender, EventArgs e)
+        {
+            _icon.Visible = false;
+            _icon.Dispose();
         }
 
         public event EventHandler RunBackupRequested;
@@ -69,10 +77,10 @@ namespace USBBackupGUI
             if (_window.WindowState == WindowState.Minimized)
             {
                 _window.ShowInTaskbar = false;
+                _window.Visibility = Visibility.Hidden;
                 return;
             }
 
-            _window.ShowInTaskbar = true;
             _lastState = _window.WindowState;
         }
 
@@ -88,6 +96,7 @@ namespace USBBackupGUI
 
             _window.ShowInTaskbar = true;
             _window.WindowState = _lastState;
+            _window.Visibility = Visibility.Visible;
         }
     }
 }

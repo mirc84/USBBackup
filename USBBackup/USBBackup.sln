@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "USBBackupGUI", "USBBackupGU
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "USBBackup", "USBBackup\USBBackup.csproj", "{BFC9E1A8-01F5-4B26-A9F9-44D642B15246}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{6A2AD780-368A-4F42-BFB5-DD7E93AA7447}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{BFC9E1A8-01F5-4B26-A9F9-44D642B15246}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BFC9E1A8-01F5-4B26-A9F9-44D642B15246}.Release|x86.ActiveCfg = Release|Any CPU
 		{BFC9E1A8-01F5-4B26-A9F9-44D642B15246}.Release|x86.Build.0 = Release|Any CPU
+		{6A2AD780-368A-4F42-BFB5-DD7E93AA7447}.Debug|Any CPU.ActiveCfg = Debug
+		{6A2AD780-368A-4F42-BFB5-DD7E93AA7447}.Debug|x86.ActiveCfg = Debug
+		{6A2AD780-368A-4F42-BFB5-DD7E93AA7447}.Release|Any CPU.ActiveCfg = Release
+		{6A2AD780-368A-4F42-BFB5-DD7E93AA7447}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

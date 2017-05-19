@@ -1,0 +1,26 @@
+﻿<Window x:Class="USBBackupGUI.Controls.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:USBBackupGUI.Controls"
+        mc:Ignorable="d"
+        Title="SettingsWindow" Height="300" Width="300"
+        SizeToContent="WidthAndHeight"
+        ResizeMode="NoResize">
+    <StackPanel>
+        <CheckBox Margin="4" Content="Watch backup folders for changes"
+                  IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=WatchBackupFolders, Mode=TwoWay}"/>
+        <CheckBox Margin="4" Content="Run backups in fix intervals"
+                  IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=BackupOnIntervals, Mode=TwoWay}" />
+
+        <Label Content="Backup Interval" Margin="4" />
+        <local:TimeSpanInputControl Margin="4" 
+                                    TimeSpan="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=BackupInterval, Mode=TwoWay}" />
+
+        <StackPanel Orientation="Horizontal">
+            <Button Margin="4" Content="Save" Click="SaveButton_Click" />
+            <Button Margin="4" Content="Cancel" Click="CancelButton_Click" />
+        </StackPanel>
+    </StackPanel>
+</Window>
