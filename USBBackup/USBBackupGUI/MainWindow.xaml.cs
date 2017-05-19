@@ -16,7 +16,7 @@ using Microsoft.Win32;
 using Ookii.Dialogs.Wpf;
 using USBBackup.Entities;
 
-namespace USBBackup
+namespace USBBackupGUI
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

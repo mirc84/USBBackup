@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using Ookii.Dialogs.Wpf;
 
-namespace USBBackup.Controls
+namespace USBBackupGUI.Controls
 {
     public partial class FolderBrowseControl : UserControl
     {

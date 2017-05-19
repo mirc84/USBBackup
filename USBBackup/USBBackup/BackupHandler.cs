@@ -9,7 +9,7 @@ using USBBackup.Entities;
 
 namespace USBBackup
 {
-    internal class BackupHandler
+    public class BackupHandler
     {
         private Dictionary<IBackup, Task> _tasks;
         private Dictionary<IBackup, CancellationTokenSource> _backupCancellationTokens;
@@ -26,9 +26,9 @@ namespace USBBackup
             {
                 HandleBackup(backup);
             }
-        }    
+        }
 
-        internal void HandleBackup(Drive drive)
+        public void HandleBackup(Drive drive)
         {
             foreach (var backup in drive.Backups)
             {
@@ -164,7 +164,7 @@ namespace USBBackup
             _tasks[backup] = task;
         }
 
-        internal void HandleBackup(Backup backup, string changedPath)
+        public void HandleBackup(Backup backup, string changedPath)
         {
             Task runningTask;
             _tasks.TryGetValue(backup, out runningTask);
@@ -232,7 +232,7 @@ namespace USBBackup
             _tasks[backup] = task;
         }
 
-        internal void CancelBackup(BackupNotificationWrapper backup)
+        public void CancelBackup(BackupNotificationWrapper backup)
         {
             CancellationTokenSource cancellationToken;
             if (!_backupCancellationTokens.TryGetValue(backup, out cancellationToken))
@@ -241,7 +241,7 @@ namespace USBBackup
             cancellationToken.Cancel();
         }
 
-        internal void CancelBackups()
+        public void CancelBackups()
         {
             foreach (var token in _backupCancellationTokens.Values)
                 token.Cancel();

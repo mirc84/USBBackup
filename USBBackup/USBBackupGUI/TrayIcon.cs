@@ -2,9 +2,9 @@
 using System.Drawing;
 using System.Windows;
 using System.Windows.Forms;
-using USBBackup.Properties;
+using USBBackupGUI.Properties;
 
-namespace USBBackup
+namespace USBBackupGUI
 {
     class TrayIcon
     {

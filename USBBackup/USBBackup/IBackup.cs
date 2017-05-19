@@ -1,6 +1,6 @@
 ﻿namespace USBBackup
 {
-    internal interface IBackup
+    public interface IBackup
     {
         bool IsEnabled { get; set; }
         bool IsRunning { get; set; }

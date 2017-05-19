@@ -11,7 +11,7 @@ namespace USBBackup
 {
     public delegate void DeviceChangedEventHandler(Drive drive);
 
-    internal class UsbDeviceRepository
+    public class UsbDeviceRepository
     {
         private readonly USBWatcher _watcher;
         private readonly DatabaseConnection _databaseConncetion;

@@ -11,7 +11,7 @@ using USBBackup.Entities;
 
 namespace USBBackup.DatabaseAccess
 {
-    internal class DatabaseConnection
+    public class DatabaseConnection
     {
         private readonly string _dbPath;
         private readonly ISessionFactory _sessionFactory;

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Windows.Threading;
+using USBBackup;
 using USBBackup.DatabaseAccess;
 
-namespace USBBackup
+namespace USBBackupGUI
 {
-    class App
+    public class App
     {
         private USBWatcher _watcher;
         private UsbDeviceRepository _deviceRepository;
