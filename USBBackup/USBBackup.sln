@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "USBBackup", "USBBackup\USBBackup.csproj", "{983F6404-B238-4177-B105-23D1852BF41F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "USBBackupGUI", "USBBackupGUI\USBBackupGUI.csproj", "{983F6404-B238-4177-B105-23D1852BF41F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "USBBackup", "USBBackup\USBBackup.csproj", "{BFC9E1A8-01F5-4B26-A9F9-44D642B15246}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{6A2AD780-368A-4F42-BFB5-DD7E93AA7447}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,18 @@ Global
 		{983F6404-B238-4177-B105-23D1852BF41F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{983F6404-B238-4177-B105-23D1852BF41F}.Release|x86.ActiveCfg = Release|x86
 		{983F6404-B238-4177-B105-23D1852BF41F}.Release|x86.Build.0 = Release|x86
+		{BFC9E1A8-01F5-4B26-A9F9-44D642B15246}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BFC9E1A8-01F5-4B26-A9F9-44D642B15246}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BFC9E1A8-01F5-4B26-A9F9-44D642B15246}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BFC9E1A8-01F5-4B26-A9F9-44D642B15246}.Debug|x86.Build.0 = Debug|Any CPU
+		{BFC9E1A8-01F5-4B26-A9F9-44D642B15246}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BFC9E1A8-01F5-4B26-A9F9-44D642B15246}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BFC9E1A8-01F5-4B26-A9F9-44D642B15246}.Release|x86.ActiveCfg = Release|Any CPU
+		{BFC9E1A8-01F5-4B26-A9F9-44D642B15246}.Release|x86.Build.0 = Release|Any CPU
+		{6A2AD780-368A-4F42-BFB5-DD7E93AA7447}.Debug|Any CPU.ActiveCfg = Debug
+		{6A2AD780-368A-4F42-BFB5-DD7E93AA7447}.Debug|x86.ActiveCfg = Debug
+		{6A2AD780-368A-4F42-BFB5-DD7E93AA7447}.Release|Any CPU.ActiveCfg = Release
+		{6A2AD780-368A-4F42-BFB5-DD7E93AA7447}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

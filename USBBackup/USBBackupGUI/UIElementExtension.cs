@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Media;
 
-namespace USBBackup
+namespace USBBackupGUI
 {
     public static class UIElementExtension
     {

@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Timers;
 using System.Windows.Threading;
 using USBBackup.DatabaseAccess;
 using USBBackup.Entities;
@@ -11,12 +14,14 @@ namespace USBBackup
 {
     public delegate void DeviceChangedEventHandler(Drive drive);
 
-    internal class UsbDeviceRepository
+    public class UsbDeviceRepository
     {
         private readonly USBWatcher _watcher;
         private readonly DatabaseConnection _databaseConncetion;
         private readonly BackupHandler _backupHandler;
         private readonly Dispatcher _dispatcher;
+        private Timer _backupTimer;
+        private IDictionary<Backup, FileSystemWatcher> _backupFileWatchers;
 
         public UsbDeviceRepository(USBWatcher watcher, DatabaseConnection databaseConncetion, BackupHandler backupHandler, Dispatcher dispatcher)
         {
@@ -24,8 +29,37 @@ namespace USBBackup
             _databaseConncetion = databaseConncetion;
             _backupHandler = backupHandler;
             _dispatcher = dispatcher;
-
+            _backupFileWatchers = new Dictionary<Backup, FileSystemWatcher>();
             USBDevices = new ObservableCollection<Drive>();
+            _backupTimer = new Timer();
+            _backupTimer.AutoReset = true;
+            _backupTimer.Interval = USBBackup.Properties.Settings.Default.BackupInterval.TotalMilliseconds;
+            _backupTimer.Elapsed += (_, __) => RunAllBackups();
+            Properties.Settings.Default.PropertyChanged += OnSettingsChanged;
+        }
+
+        private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
+        {
+            _backupTimer.Stop();
+            _backupTimer.Interval = Properties.Settings.Default.BackupInterval.TotalMilliseconds;
+
+            foreach (var fileWatcher in _backupFileWatchers.Values)
+            {
+                fileWatcher.EnableRaisingEvents = Properties.Settings.Default.WatchBackupSources;
+            }
+
+            if (Properties.Settings.Default.HandleBackupOnInterval)
+            {
+                _backupTimer.Start();
+            }
+        }
+
+        private void RunAllBackups()
+        {
+            foreach (var drive in USBDevices)
+            {
+                _backupHandler.HandleBackup(drive);
+            }
         }
 
         public IList<Drive> USBDevices { get; }
@@ -46,6 +80,7 @@ namespace USBBackup
                     watcher.Changed += (s, f) => OnDirChanged(backup, f);
                     watcher.Created += (s, f) => OnDirChanged(backup, f);
                     watcher.Deleted += (s, f) => OnDirDeleted(backup, f);
+                    _backupFileWatchers[backup] = watcher;
                 }
             }
             var attachedUSBDevices = _watcher.LoadDrives().ToList();

@@ -4,10 +4,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using USBBackup;
 using USBBackup.Core;
 using USBBackup.Entities;
 
-namespace USBBackup
+namespace USBBackupGUI
 {
     public delegate MessageBoxResult AskUserEventHandler(string message, string caption);
 

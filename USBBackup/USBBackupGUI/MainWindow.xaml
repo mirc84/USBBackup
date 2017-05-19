@@ -1,16 +1,15 @@
-﻿<Window x:Class="USBBackup.MainWindow"
+﻿<Window x:Class="USBBackupGUI.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:USBBackup"
-        xmlns:entities="clr-namespace:USBBackup.Entities"
-        xmlns:controls="clr-namespace:USBBackup.Controls"
+        xmlns:local="clr-namespace:USBBackupGUI"
+        xmlns:controls="clr-namespace:USBBackupGUI.Controls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525"
+        Title="USB Backup" Width="700"
         d:DataContext="{d:DesignInstance local:MainWindowViewModel}"
-        SizeToContent="WidthAndHeight"
-        WindowState="Minimized">
+        SizeToContent="Height"
+        Icon="/Resources/Hopstarter-Soft-Scraps-USB.ico">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -22,6 +21,8 @@
                     Command="{Binding SaveCommand}" />
             <Button Margin="4" Content="Run All Backups"
                     Command="{Binding RunAllBackupsCommand}" />
+            <Button Margin="4" Content="Settings"
+                    Click="SettingsButton_Click" />
         </StackPanel>
         
         <ItemsControl Margin="10" Grid.Row="1" ItemsSource="{Binding UsbDevices}" Grid.IsSharedSizeScope="True" >

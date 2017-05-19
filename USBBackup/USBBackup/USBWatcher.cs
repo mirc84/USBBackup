@@ -6,9 +6,9 @@ using USBBackup.Entities;
 
 namespace USBBackup
 {
-    internal delegate void DriveAttachedHandler(Drive deviceInfo);
+    public delegate void DriveAttachedHandler(Drive deviceInfo);
 
-    internal class USBWatcher : NotificationObject
+    public class USBWatcher : NotificationObject
     {
         private ManagementEventWatcher _changedWatcher;
         private readonly IList<Drive> _drives;

@@ -1,22 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Microsoft.Win32;
 using Ookii.Dialogs.Wpf;
 using USBBackup.Entities;
+using USBBackupGUI.Controls;
 
-namespace USBBackup
+namespace USBBackupGUI
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -83,6 +72,30 @@ namespace USBBackup
             if (dialog.ShowDialog().GetValueOrDefault())
             {
                 backupInfo.SourcePath = dialog.SelectedPath;
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            USBBackup.Properties.Settings.Default.Reload();
+            var win = new SettingsWindow()
+            {
+                Owner = this,
+                BackupInterval = USBBackup.Properties.Settings.Default.BackupInterval,
+                BackupOnIntervals = USBBackup.Properties.Settings.Default.HandleBackupOnInterval,
+                WatchBackupFolders = USBBackup.Properties.Settings.Default.WatchBackupSources
+        };
+            if (win.ShowDialog().GetValueOrDefault())
+            {
+                USBBackup.Properties.Settings.Default.BackupInterval = win.BackupInterval;
+                USBBackup.Properties.Settings.Default.HandleBackupOnInterval = win.BackupOnIntervals;
+                USBBackup.Properties.Settings.Default.WatchBackupSources = win.WatchBackupFolders;
+                USBBackup.Properties.Settings.Default.Save();
             }
         }
     }
