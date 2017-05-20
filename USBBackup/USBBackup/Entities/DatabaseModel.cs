@@ -1,9 +1,11 @@
 ﻿using FluentNHibernate.Mapping;
 using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace USBBackup.Entities
 {
-    public abstract class DatabaseModel
+    public abstract class DatabaseModel : INotifyPropertyChanged
     {
         public virtual Guid Id { get; set; }
 
@@ -11,6 +13,13 @@ namespace USBBackup.Entities
         {
             if (Id == Guid.Empty)
                 Id = Guid.NewGuid();
+        }
+
+        public virtual event PropertyChangedEventHandler PropertyChanged;
+
+        public virtual void OnPropertyChanged([CallerMemberName]string name = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 

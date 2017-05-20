@@ -50,6 +50,18 @@ namespace USBBackupGUI.Controls
 
 
 
+        public bool CleanupRemovedFile
+        {
+            get { return (bool)GetValue(CleanupRemovedFileProperty); }
+            set { SetValue(CleanupRemovedFileProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for CleanupRemovedFile.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty CleanupRemovedFileProperty =
+            DependencyProperty.Register("CleanupRemovedFile", typeof(bool), typeof(SettingsWindow), new PropertyMetadata(false));
+
+
+
         public bool BackupOnIntervals
         {
             get { return (bool)GetValue(BackupOnIntervalsProperty); }
@@ -63,15 +75,15 @@ namespace USBBackupGUI.Controls
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
-            Close();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = true;
             var choice = MessageBox.Show("Do you want to close without saving?", "Reject Changes?", MessageBoxButton.OKCancel);
-            if (choice == MessageBoxResult.Yes)
-                Close();
+            if (choice != MessageBoxResult.OK)
+                return;
+
+            DialogResult = false;
         }
     }
 }

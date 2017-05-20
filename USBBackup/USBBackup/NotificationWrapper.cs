@@ -13,7 +13,8 @@ namespace USBBackup
         public DriveNotificationWrapper(Drive drive)
         {
             _drive = drive;
-            Backups  = new ObservableCollection<BackupNotificationWrapper>(drive.Backups.Select(x => new BackupNotificationWrapper(x)).ToList());
+            _drive.PropertyChanged += (s, name) => OnPropertyChanged(name.PropertyName);
+            Backups  = new ObservableCollection<Backup>(drive.Backups);
             Backups.CollectionChanged += BackupsOnCollectionChanged;
         }
 
@@ -22,20 +23,20 @@ namespace USBBackup
         private void BackupsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
             if (args.OldItems != null)
-                foreach (var oldItem in args.OldItems.OfType<BackupNotificationWrapper>())
-                    _drive.Backups.Remove(oldItem.Backup);
+                foreach (var oldItem in args.OldItems.OfType<Backup>())
+                    _drive.Backups.Remove(oldItem);
             if (args.NewItems != null)
-                foreach (var newItem in args.NewItems.OfType<BackupNotificationWrapper>())
-                    _drive.Backups.Add(newItem.Backup);
+                foreach (var newItem in args.NewItems.OfType<Backup>())
+                    _drive.Backups.Add(newItem);
         }
 
-        public ObservableCollection<BackupNotificationWrapper> Backups { get; set; }
+        public ObservableCollection<Backup> Backups { get; set; }
 
         public string DriveLetter => _drive.DriveLetter;
 
         public string Model => _drive.Model;
 
-        public string VolumeName => _drive.Name;
+        public string Name => _drive.Name;
 
         public bool IsAttached
         {
@@ -43,58 +44,6 @@ namespace USBBackup
             set
             {
                 _drive.IsAttached = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    public class BackupNotificationWrapper : NotificationObject, IBackup
-    {
-        bool _isRunning;
-
-        public BackupNotificationWrapper(Backup backup)
-        {
-            Backup = backup;
-        }
-
-        public Backup Backup { get; }
-
-        public string SourcePath
-        {
-            get { return Backup.SourcePath; }
-            set
-            {
-                Backup.SourcePath = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string TargetPath
-        {
-            get { return Backup.TargetPath; }
-            set
-            {
-                Backup.TargetPath = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool IsEnabled
-        {
-            get { return Backup.IsEnabled; }
-            set
-            {
-                Backup.IsEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool IsRunning
-        {
-            get { return _isRunning; }
-            set
-            {
-                _isRunning = value;
                 OnPropertyChanged();
             }
         }

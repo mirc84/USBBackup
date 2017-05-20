@@ -13,7 +13,10 @@
         </Grid.ColumnDefinitions>
 
         <TextBox Margin="2" MinWidth="100"
+                 VerticalContentAlignment="Center"
                  Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:FolderBrowseControl}, Path=SelectedPath, Mode=TwoWay}"></TextBox>
-        <Button Margin="2" Grid.Column="1" Content="Open" Click="OpenButton_OnClick"></Button>
+        <Button Margin="2" Grid.Column="1" 
+                Content="Open" 
+                Click="OpenButton_OnClick"></Button>
     </Grid>
 </UserControl>

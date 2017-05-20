@@ -44,38 +44,71 @@
                                     <DataTemplate DataType="local:BackupNotificationWrapper">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <Grid.RowDefinitions>
-                                                <RowDefinition Height="*" />
-                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
                                             </Grid.RowDefinitions>
-                                            
-                                            <TextBlock Text="Source"></TextBlock>
-                                            <controls:FolderBrowseControl Grid.Row="1" Grid.Column="0"
-                                                                          PathRestriction="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Expander}, Path=DataContext.DriveLetter}"
+
+                                            <TextBlock Margin="4" Grid.Row="0" Grid.ColumnSpan="6"
+                                                       Text="{Binding CurrentFile}" />
+
+                                            <CheckBox Margin="4" Grid.Row="2" Grid.Column="0"
+                                                      VerticalAlignment="Center"
+                                                      IsChecked="{Binding IsEnabled, Mode=TwoWay}"/>
+
+                                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Source"></TextBlock>
+                                            <controls:FolderBrowseControl Grid.Row="2" Grid.Column="1"
                                                                           SelectedPath="{Binding SourcePath, Mode=TwoWay}" />
-                                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Target"></TextBlock>
-                                            <controls:FolderBrowseControl Grid.Row="1" Grid.Column="1"
+                                            <TextBlock Grid.Row="1" Grid.Column="2" Text="Target"></TextBlock>
+                                            <controls:FolderBrowseControl Grid.Row="2" Grid.Column="2"
+                                                                          PathRestriction="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Expander}, Path=DataContext.DriveLetter}"
                                                                           SelectedPath="{Binding TargetPath, Mode=TwoWay}"/>
 
-                                            <CheckBox Margin="4" Grid.Row="1" Grid.Column="2"
-                                                      IsChecked="{Binding IsEnabled, Mode=TwoWay}"/>
-                                            <Button Margin="4" Content="Run" Grid.Row="1" Grid.Column="3"
-                                                    Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.RunBackupCommand}"
-                                                    CommandParameter="{Binding }"></Button>
-                                            <Button Margin="4" Content="Remove" Grid.Row="1" Grid.Column="4"
-                                                    Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.RemoveBackupCommand}"
-                                                    CommandParameter="{Binding }"></Button>
-                                            <Button Margin="4" Content="Cancel" Grid.Row="1" Grid.Column="5"
+                                            <Button Margin="4" Grid.Row="2" Grid.Column="3"
+                                                    Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.RunPauseResumeBackupCommand}"
+                                                    CommandParameter="{Binding }">
+                                                <Button.Style>
+                                                    <Style TargetType="Button">
+                                                        <Setter Property="Content">
+                                                            <Setter.Value>
+                                                                <Image Source="/Resources/play-icon.png" />
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                        <Style.Triggers>
+                                                            <MultiDataTrigger>
+                                                                <MultiDataTrigger.Conditions>
+                                                                    <Condition Binding="{Binding IsRunning}" Value="True" />
+                                                                    <Condition Binding="{Binding IsPaused}" Value="False" />
+                                                                </MultiDataTrigger.Conditions>
+                                                                <Setter Property="Content">
+                                                                    <Setter.Value>
+                                                                        <Image Source="/Resources/pause-icon.png" />
+                                                                    </Setter.Value>
+                                                                </Setter>
+                                                            </MultiDataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <Button Margin="4" Grid.Row="2" Grid.Column="4"
                                                     IsEnabled="{Binding IsRunning}"
                                                     Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.CancelBackupCommand}"
-                                                    CommandParameter="{Binding }"></Button>
+                                                    CommandParameter="{Binding }">
+                                                <Image Source="/Resources/stop-icon.png" />
+                                            </Button>
+                                            <Button Margin="4" Grid.Row="2" Grid.Column="5"
+                                                    Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.RemoveBackupCommand}"
+                                                    CommandParameter="{Binding }">
+                                                <Image Source="/Resources/close-icon.png" />
+                                            </Button>
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>

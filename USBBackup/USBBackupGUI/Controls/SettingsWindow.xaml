@@ -13,7 +13,9 @@
                   IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=WatchBackupFolders, Mode=TwoWay}"/>
         <CheckBox Margin="4" Content="Run backups in fix intervals"
                   IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=BackupOnIntervals, Mode=TwoWay}" />
-
+        <CheckBox Margin="4" Content="Clean up backup directories"
+                  IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=CleanupRemovedFile, Mode=TwoWay}" />
+        
         <Label Content="Backup Interval" Margin="4" />
         <local:TimeSpanInputControl Margin="4" 
                                     TimeSpan="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=BackupInterval, Mode=TwoWay}" />

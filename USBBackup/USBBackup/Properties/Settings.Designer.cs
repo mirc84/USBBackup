@@ -58,5 +58,17 @@ namespace USBBackup.Properties {
                 this["WatchBackupSources"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool CleanupRemovedFile {
+            get {
+                return ((bool)(this["CleanupRemovedFile"]));
+            }
+            set {
+                this["CleanupRemovedFile"] = value;
+            }
+        }
     }
 }

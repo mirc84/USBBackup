@@ -9,17 +9,29 @@ using USBBackup.Entities;
 
 namespace USBBackup
 {
+    public delegate void BackupHandledEventHandler(IBackup backup);
+    public delegate void BackupStateChangedEventHandler(BackupState state);
+
     public class BackupHandler
     {
         private Dictionary<IBackup, Task> _tasks;
         private Dictionary<IBackup, CancellationTokenSource> _backupCancellationTokens;
+        private volatile Dictionary<IBackup, ManualResetEvent> _backupResetEvents;
+        private BackupState _state;
 
         public BackupHandler()
         {
             _tasks = new Dictionary<IBackup, Task>();
             _backupCancellationTokens = new Dictionary<IBackup, CancellationTokenSource>();
+            _backupResetEvents = new Dictionary<IBackup, ManualResetEvent>();
         }
-        
+
+        public event BackupHandledEventHandler BackupStarted;
+        public event BackupHandledEventHandler BackupFinished;
+        public event BackupHandledEventHandler CleanupStarted;
+        public event BackupHandledEventHandler CleanupFinished;
+        public event BackupStateChangedEventHandler StateChanged;
+
         public void HandleBackup(DriveNotificationWrapper existingDevice)
         {
             foreach (var backup in existingDevice.Backups)
@@ -36,29 +48,19 @@ namespace USBBackup
             }
         }
         
-        public void HandleBackup(IBackup backup)
+        public void HandleBackup(IBackup backup, bool force = false)
         {
-            if (!backup.IsEnabled || backup.IsRunning || _tasks.ContainsKey(backup))
+            if ((!backup.IsEnabled && !force) || backup.IsRunning)
                 return;
 
-            CancellationTokenSource token;
-            if (!_backupCancellationTokens.TryGetValue(backup, out token) || token.Token.IsCancellationRequested)
-            {
-                token = new CancellationTokenSource();
-                _backupCancellationTokens[backup] = token;
-            }
-
-            Task task;
-            if (!_tasks.TryGetValue(backup, out task))
-            {
-                task = Task.Factory.StartNew(() => { });
-            }
+            PrepareBackup(backup, out CancellationTokenSource token, out ManualResetEvent pauseEvent, out Task task);
 
             task = task.ContinueWith(t =>
             {
                 try
                 {
                     backup.IsRunning = true;
+                    OnBackupStarted(backup);
                     var dir = new DirectoryInfo(backup.SourcePath);
                     if (!dir.Exists)
                         return;
@@ -69,12 +71,18 @@ namespace USBBackup
 
                     foreach (var fileInfo in dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
                     {
+                        //if (backup.IsPaused)
+                        {
+                            pauseEvent.WaitOne();
+                        }
+                        backup.IsPaused = false;
                         if (token.Token.IsCancellationRequested)
                             return;
 
                         try
                         {
                             var relativePath = fileInfo.FullName.Substring(backup.SourcePath.Length);
+                            backup.CurrentFile = ".." + relativePath;
                             var targetFileInfo = new FileInfo(string.Concat(backup.TargetPath, relativePath));
 
                             if (!targetFileInfo.Directory.Exists)
@@ -106,57 +114,111 @@ namespace USBBackup
                 }
                 finally
                 {
+                    backup.CurrentFile = null;
                     backup.IsRunning = false;
+                    backup.IsPaused = false;
+                    OnBackupFinished(backup);
                 }
             }, token.Token);
             _tasks[backup] = task;
+
+            if (USBBackup.Properties.Settings.Default.CleanupRemovedFile)
+                RecycleBackupFiles(backup);
         }
 
-        public void RecycleBackupFiles(IBackup backup)
+        private void PrepareBackup(IBackup backup, out CancellationTokenSource token, out ManualResetEvent pauseEvent, out Task task)
         {
-            var token = new CancellationTokenSource();
             if (!_backupCancellationTokens.TryGetValue(backup, out token) || token.Token.IsCancellationRequested)
             {
                 token = new CancellationTokenSource();
                 _backupCancellationTokens[backup] = token;
             }
 
-            Task task;
+            if (!_backupResetEvents.TryGetValue(backup, out pauseEvent))
+            {
+                pauseEvent = new ManualResetEvent(false);
+                _backupResetEvents[backup] = pauseEvent;
+            }
+            pauseEvent.Set();
+
             if (!_tasks.TryGetValue(backup, out task))
             {
-                task = Task.Factory.StartNew(() => { });
+                task = Task.Factory.StartNew(() => { backup.IsRunning = false; });
             }
+        }
+
+        public void RecycleBackupFiles(IBackup backup)
+        {
+            if (!backup.IsEnabled)
+                return;
+
+            PrepareBackup(backup, out CancellationTokenSource token, out ManualResetEvent pauseEvent, out Task task);
+            
             task = task.ContinueWith(t =>
             {
                 var directory = new DirectoryInfo(backup.TargetPath);
                 if (!directory.Exists)
                     return;
-
-                foreach (var fileInfo in directory.EnumerateFiles("*.*", SearchOption.AllDirectories))
+                try
                 {
-                    var relativePath = fileInfo.FullName.Substring(backup.TargetPath.Length);
-                    if (!Directory.Exists(backup.SourcePath))
-                        return;
-                    var sourcePath = string.Concat(backup.SourcePath, relativePath);
-                    if (File.Exists(sourcePath))
-                        continue;
-
+                    backup.IsRunning = true;
+                    OnCleanupStarted(backup);
                     var recycleBin = Path.Combine(backup.TargetPath, ".recyclebin");
-                    if (Directory.Exists(recycleBin))
-                        Directory.CreateDirectory(recycleBin);
-
-                    var recycledFilePath = string.Concat(recycleBin, relativePath);
-                    var recycleFileInfo = new FileInfo(recycledFilePath);
-                    if (recycleFileInfo.Exists)
+                    foreach (var fileInfo in directory.EnumerateFiles("*.*", SearchOption.AllDirectories))
                     {
-                        if (recycleFileInfo.LastWriteTime == fileInfo.LastWriteTime)
-                        {
-                            fileInfo.Delete();
+                        if (fileInfo.FullName.StartsWith(recycleBin))
                             continue;
+                        //if (backup.IsPaused)
+                        {
+                            pauseEvent.WaitOne();
                         }
-                        recycleFileInfo.Delete();
+                        backup.IsPaused = false;
+                        if (token.Token.IsCancellationRequested)
+                            return;
+
+                        try
+                        {
+                            var relativePath = fileInfo.FullName.Substring(backup.TargetPath.Length);
+                            if (!Directory.Exists(backup.SourcePath))
+                                return;
+                            var sourcePath = string.Concat(backup.SourcePath, relativePath);
+                            if (File.Exists(sourcePath))
+                                continue;
+
+
+                            var recycledFilePath = string.Concat(recycleBin, relativePath);
+                            var recycleFileInfo = new FileInfo(recycledFilePath);
+                            if (recycleFileInfo.Exists)
+                            {
+                                if (recycleFileInfo.LastWriteTime == fileInfo.LastWriteTime)
+                                {
+                                    fileInfo.Delete();
+                                    continue;
+                                }
+                                recycleFileInfo.Delete();
+                            }
+
+                            if (!recycleFileInfo.Directory.Exists)
+                                recycleFileInfo.Directory.Create();
+
+                            File.Move(fileInfo.FullName, recycleFileInfo.FullName);
+                        }
+                        catch (Exception)
+                        {
+
+                        }
                     }
-                    File.Move(fileInfo.FullName, recycleFileInfo.FullName);
+                }
+                catch (Exception)
+                {
+
+                }
+                finally
+                {
+                    backup.CurrentFile = null;
+                    backup.IsRunning = false;
+                    backup.IsPaused = false;
+                    OnCleanupFinished(backup);
                 }
             }
             , token.Token);
@@ -182,6 +244,7 @@ namespace USBBackup
             {
                 try
                 {
+                    OnBackupStarted(backup);
                     backup.IsRunning = true;
                     var fileInfo = new FileInfo(changedPath);
                     if (!fileInfo.Exists)
@@ -194,6 +257,7 @@ namespace USBBackup
                     try
                     {
                         var relativePath = changedPath.Substring(backup.SourcePath.Length);
+                        backup.CurrentFile = ".." + relativePath;
                         var targetFileInfo = new FileInfo(string.Concat(backup.TargetPath, relativePath));
 
                         if (targetFileInfo.Exists && fileInfo.LastWriteTime == targetFileInfo.LastWriteTime)
@@ -225,29 +289,120 @@ namespace USBBackup
                 }
                 finally
                 {
+                    backup.CurrentFile = null;
                     backup.IsRunning = false;
+                    OnBackupFinished(backup);
                 }
             }, token.Token);
 
             _tasks[backup] = task;
         }
 
-        public void CancelBackup(BackupNotificationWrapper backup)
+        public void PauseResumeBackups()
         {
-            CancellationTokenSource cancellationToken;
-            if (!_backupCancellationTokens.TryGetValue(backup, out cancellationToken))
-                return;
+            switch (_state)
+            {
+                case BackupState.Idle:
+                    return;
+                case BackupState.Running:
+                    PauseBackups();
+                    break;
+                case BackupState.Paused:
+                    ResumeBackups();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException($"Backup state {_state} unknown.");
+            }
+        }
 
-            cancellationToken.Cancel();
+        public void PauseBackups()
+        {
+            foreach (var pauseEvent in _backupResetEvents)
+            {
+                pauseEvent.Key.IsPaused = true;
+                pauseEvent.Value.Reset();
+            }
+            OnStateChanged();
+        }
+
+        public void PauseBackup(IBackup backup)
+        {
+            _backupResetEvents.TryGetValue(backup, out ManualResetEvent pauseEvent);
+            pauseEvent?.Reset();
+            backup.IsPaused = true;
+            OnStateChanged();
+        }
+
+        public void ResumeBackups()
+        {
+            foreach (var pauseEvent in _backupResetEvents)
+            {
+                pauseEvent.Key.IsPaused = false;
+                pauseEvent.Value.Set();
+            }
+            OnStateChanged();
+        }
+
+        public void ResumeBackup(IBackup backup)
+        {
+            backup.IsPaused = false;
+            _backupResetEvents.TryGetValue(backup, out ManualResetEvent pauseEvent);
+            pauseEvent?.Set();
+            OnStateChanged();
+        }
+
+        public void CancelBackup(IBackup backup)
+        {
+            _backupCancellationTokens.TryGetValue(backup, out CancellationTokenSource cancellationToken);
+            cancellationToken?.Cancel();
+            _backupResetEvents.TryGetValue(backup, out ManualResetEvent pauseEvent);
+            pauseEvent?.Set();
         }
 
         public void CancelBackups()
         {
             foreach (var token in _backupCancellationTokens.Values)
                 token.Cancel();
-
+            foreach (var pauseEvent in _backupResetEvents.Values)
+                pauseEvent.Set();
             foreach (var task in _tasks.Values.ToList())
                 task.Wait();
+
+            OnStateChanged();
+        }
+
+        private void OnBackupStarted(IBackup backup)
+        {
+            BackupStarted?.Invoke(backup);
+            OnStateChanged();
+        }
+
+        private void OnBackupFinished(IBackup backup)
+        {
+            BackupFinished?.Invoke(backup);
+            OnStateChanged();
+        }
+
+        private void OnCleanupStarted(IBackup backup)
+        {
+            CleanupStarted?.Invoke(backup);
+            OnStateChanged();
+        }
+
+        private void OnCleanupFinished(IBackup backup)
+        {
+            CleanupFinished?.Invoke(backup);
+            OnStateChanged();
+        }
+
+        private void OnStateChanged()
+        {
+            _state = default(BackupState);
+            if (_tasks.All(x => x.Key.IsPaused))
+                _state = BackupState.Paused;
+            else if (_tasks.Any(x => x.Key.IsRunning))
+                _state = BackupState.Running;
+            StateChanged?.Invoke(_state);
         }
     }
 }
