@@ -11,6 +11,7 @@ using USBBackup.Entities;
 namespace USBBackupGUI
 {
     public delegate MessageBoxResult AskUserEventHandler(string message, string caption);
+    public delegate void NotifyUserEventHandler(string message, string caption);
 
     class MainWindowViewModel : NotificationObject
     {
@@ -27,6 +28,7 @@ namespace USBBackupGUI
             RemoveBackupCommand = new RelayCommand(RemoveBackup);
             RunBackupCommand = new RelayCommand(RunBackup);
             CancelBackupCommand = new RelayCommand(CancelBackup);
+            RunPauseResumeBackupCommand = new RelayCommand(RunPauseResumeBackup);
             RunAllBackupsCommand = new RelayCommand(RunAllBackups);
             SaveCommand = new RelayCommand(Save);
             UsbDevices = new ObservableCollection<DriveNotificationWrapper>(_usbDeviceRepository.USBDevices.Select(x => new DriveNotificationWrapper(x)).ToList());
@@ -37,11 +39,30 @@ namespace USBBackupGUI
             return (UserChoiceRequested?.Invoke(message, caption)).GetValueOrDefault(MessageBoxResult.No);
         }
 
+        protected virtual void OnUserNotification(string message, string caption)
+        {
+            UserNotification?.Invoke(message, caption);
+        }
+
         public event AskUserEventHandler UserChoiceRequested;
+        public event NotifyUserEventHandler UserNotification;
+
+        private void RunPauseResumeBackup(object obj)
+        {
+            var backup = obj as Backup;
+            if (backup == null)
+                return;
+            else if (!backup.IsRunning)
+                _backupHandler.HandleBackup(backup, true);
+            else if (backup.IsPaused)
+                _backupHandler.ResumeBackup(backup);
+            else
+                _backupHandler.PauseBackup(backup);
+        }
 
         private void CancelBackup(object obj)
         {
-            var backup = obj as BackupNotificationWrapper;
+            var backup = obj as Backup;
             if (backup == null)
                 return;
 
@@ -50,7 +71,7 @@ namespace USBBackupGUI
 
         private void RemoveBackup(object obj)
         {
-            var backup = obj as BackupNotificationWrapper;
+            var backup = obj as Backup;
             if (backup == null)
                 return;
 
@@ -69,6 +90,7 @@ namespace USBBackupGUI
         private void Save(object obj)
         {
             _usbDeviceRepository.Save();
+            OnUserNotification("Backups successfully saved", "Saved");
         }
 
         private void RunAllBackups(object obj)
@@ -93,6 +115,7 @@ namespace USBBackupGUI
         public ICommand RemoveBackupCommand { get; }
         public ICommand RunBackupCommand { get; }
         public ICommand CancelBackupCommand { get; }
+        public ICommand RunPauseResumeBackupCommand { get; }
         public ICommand RunAllBackupsCommand { get; }
         public ICommand SaveCommand { get; }
 
@@ -101,8 +124,8 @@ namespace USBBackupGUI
             var existing = UsbDevices.FirstOrDefault(x => x.Drive.DeviceID == drive.DeviceID && x.Drive.PNPDeviceID == drive.PNPDeviceID);
             if (existing == null)
                 UsbDevices.Add(new DriveNotificationWrapper(drive));
-
-            existing.IsAttached = drive.IsAttached;
+            else
+                existing.IsAttached = drive.IsAttached;
         }
 
         private void AddBackup(object obj)
@@ -113,7 +136,7 @@ namespace USBBackupGUI
 
             var backup = new Backup();
             backup.TargetPath = drive.DriveLetter;
-            drive.Backups.Add(new BackupNotificationWrapper(backup));
+            drive.Backups.Add(backup);
         }
 
         private void RunBackup(object obj)
@@ -124,7 +147,7 @@ namespace USBBackupGUI
                 _backupHandler.HandleBackup(drive);
                 return;
             }
-            var backup = obj as BackupNotificationWrapper;
+            var backup = obj as Backup;
             if (backup != null)
             {
                 _backupHandler.HandleBackup(backup);

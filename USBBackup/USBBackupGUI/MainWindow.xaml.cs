@@ -4,6 +4,8 @@ using System.Windows.Input;
 using Ookii.Dialogs.Wpf;
 using USBBackup.Entities;
 using USBBackupGUI.Controls;
+using System.ComponentModel;
+using System;
 
 namespace USBBackupGUI
 {
@@ -18,12 +20,28 @@ namespace USBBackupGUI
         {
             InitializeComponent();
             DataContextChanged += OnDataContextChanged;
+            Closing += OnClosing;
+        }
+
+        private void OnClosing(object sender, CancelEventArgs args)
+        {
+            var choice = MessageBox.Show("Do you want to save your changes?", "Save Changes?", MessageBoxButton.YesNoCancel);
+            if (choice == MessageBoxResult.Yes)
+                _viewModel.SaveCommand.Execute(null);
+
+            args.Cancel = choice == MessageBoxResult.Cancel;
         }
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            _viewModel = e.NewValue as MainWindowViewModel;
+            _viewModel = e.NewValue as MainWindowViewModel; 
             _viewModel.UserChoiceRequested += OnUserChoiceRequested;
+            _viewModel.UserNotification += OnUserNotification;
+        }
+
+        private void OnUserNotification(string message, string caption)
+        {
+            MessageBox.Show(message, caption, MessageBoxButton.OK);
         }
 
         private MessageBoxResult OnUserChoiceRequested(string message, string caption)
@@ -31,55 +49,7 @@ namespace USBBackupGUI
             var result = MessageBox.Show(message, caption, MessageBoxButton.YesNo);
             return result;
         }
-
-        private void Control_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
-        private void SourceButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            var element = sender as FrameworkElement;
-            if (element == null)
-                return;
-
-            var backupInfo = element.DataContext as Backup;
-            if (backupInfo == null)
-            {
-                element = element.FindAncestor<DataGridRow>();
-                var device = element?.DataContext as Drive;
-                if (device == null)
-                    return;
-
-                //backupInfo = new Backup();
-                //device.Drives.Add(backupInfo);
-            }
-
-            var dialog = new VistaFolderBrowserDialog {SelectedPath = backupInfo.SourcePath};
-            if (dialog.ShowDialog().GetValueOrDefault())
-            {
-                backupInfo.SourcePath = dialog.SelectedPath;
-            }
-        }
-
-        private void TargetButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            var backupInfo = (sender as FrameworkElement)?.DataContext as Backup;
-            if (backupInfo == null)
-                return;
-
-            var dialog = new VistaFolderBrowserDialog {SelectedPath = backupInfo.SourcePath};
-            if (dialog.ShowDialog().GetValueOrDefault())
-            {
-                backupInfo.SourcePath = dialog.SelectedPath;
-            }
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
+        
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             USBBackup.Properties.Settings.Default.Reload();
@@ -88,13 +58,15 @@ namespace USBBackupGUI
                 Owner = this,
                 BackupInterval = USBBackup.Properties.Settings.Default.BackupInterval,
                 BackupOnIntervals = USBBackup.Properties.Settings.Default.HandleBackupOnInterval,
-                WatchBackupFolders = USBBackup.Properties.Settings.Default.WatchBackupSources
-        };
+                WatchBackupFolders = USBBackup.Properties.Settings.Default.WatchBackupSources,
+                CleanupRemovedFile = USBBackup.Properties.Settings.Default.CleanupRemovedFile,
+            };
             if (win.ShowDialog().GetValueOrDefault())
             {
                 USBBackup.Properties.Settings.Default.BackupInterval = win.BackupInterval;
                 USBBackup.Properties.Settings.Default.HandleBackupOnInterval = win.BackupOnIntervals;
                 USBBackup.Properties.Settings.Default.WatchBackupSources = win.WatchBackupFolders;
+                USBBackup.Properties.Settings.Default.CleanupRemovedFile = win.CleanupRemovedFile;
                 USBBackup.Properties.Settings.Default.Save();
             }
         }

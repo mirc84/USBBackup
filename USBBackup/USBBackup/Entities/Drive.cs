@@ -5,15 +5,36 @@ namespace USBBackup.Entities
 {
     public class Drive : DatabaseModel
     {
+        private string _driveLetter;
+        private string _model;
+
         public Drive()
         {
             Backups = new List<Backup>();
         }
 
-        public virtual string DriveLetter { get; set; }
+        public virtual string DriveLetter
+        {
+            get { return _driveLetter; }
+            set
+            {
+                _driveLetter = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public virtual string Model
+        {
+            get { return _model; }
+            set
+            {
+                _model = value;
+                OnPropertyChanged();
+            }
+        }
+
         public virtual string Name { get; set; }
         public virtual string DeviceID { get; set; }
-        public virtual string Model { get; set; }
         public virtual string PNPDeviceID  { get; set; }
 
         public virtual ulong FreeSpace { get; set; }

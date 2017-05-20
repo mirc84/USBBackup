@@ -30,6 +30,7 @@ namespace USBBackupGUI
         {
             base.OnStartup(e);
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
             _watcher = new USBWatcher();
             _watcher.Init();
             _backupHandler = new BackupHandler();
@@ -39,7 +40,6 @@ namespace USBBackupGUI
                 Directory.CreateDirectory(directory);
             _databaseContext = new DatabaseConnection(dbPath);
             _deviceRepository = new UsbDeviceRepository(_watcher, _databaseContext, _backupHandler, Dispatcher.CurrentDispatcher);
-            _deviceRepository.Load();
 
             _viewModel = new MainWindowViewModel(_deviceRepository, _backupHandler);
             _window = new MainWindow()
@@ -52,6 +52,26 @@ namespace USBBackupGUI
 
             var trayIcon = new TrayIcon(_window);
             trayIcon.RunBackupRequested += OnRunBackupRequested;
+            trayIcon.PauseResumeBackupsRequested += OnPauseResumeBackupsRequested;
+            trayIcon.CancelBackupsRequested += OnCancelBackupsRequested;
+
+            _backupHandler.BackupStarted += trayIcon.OnNotifyBackupStarted;
+            _backupHandler.BackupFinished += trayIcon.OnNotifyBackupFinished;
+            _backupHandler.CleanupStarted += trayIcon.OnNotifyCleanupStarted;
+            _backupHandler.CleanupFinished += trayIcon.OnNotifyCleanupFinished;
+            _backupHandler.StateChanged += trayIcon.OnStateChanged;
+
+            _deviceRepository.Load();
+        }
+
+        private void OnPauseResumeBackupsRequested(object sender, EventArgs e)
+        {
+            _backupHandler.PauseResumeBackups();
+        }
+
+        private void OnCancelBackupsRequested(object sender, EventArgs e)
+        {
+            _backupHandler.CancelBackups();
         }
 
         private void OnRunBackupRequested(object sender, EventArgs e)
