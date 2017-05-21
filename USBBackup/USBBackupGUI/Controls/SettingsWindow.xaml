@@ -21,7 +21,7 @@
         <StackPanel Orientation="Horizontal">
             <Label Content="{lex:Loc USBBackup:StringResource:SettingsWindow_Language}" />
             <ComboBox x:Name="_languageComboBox" Margin="4"
-                      SelectedItem="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=SelectedLanguage}">
+                      SelectedItem="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=SelectedLanguage, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate DataType="CultureInfo">
                         <TextBlock Text="{Binding NativeName}" />
@@ -30,9 +30,22 @@
             </ComboBox>
 
         </StackPanel>
+        <CheckBox Margin="4" Content="{lex:Loc USBBackup:StringResource:SettingsWindow_NotifyBackupStarted}"
+                  IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=NotifyBackupStarted, Mode=TwoWay}"/>
+        <CheckBox Margin="4" Content="{lex:Loc USBBackup:StringResource:SettingsWindow_NotifyBackupFinished}"
+                  IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=NotifyBackupFinished, Mode=TwoWay}"/>
+        <CheckBox Margin="4" Content="{lex:Loc USBBackup:StringResource:SettingsWindow_NotifyCleanupStarted}"
+                  IsEnabled="{Binding ElementName=_cleanupCheckBox, Path=IsChecked}"
+                  IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=NotifyCleanupStarted, Mode=TwoWay}"/>
+        <CheckBox Margin="4" Content="{lex:Loc USBBackup:StringResource:SettingsWindow_NotifyCleanupFinished}"
+                  IsEnabled="{Binding ElementName=_cleanupCheckBox, Path=IsChecked}"
+                  IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=NotifyCleanupFinished, Mode=TwoWay}"/>
+
+        <Separator HorizontalAlignment="Stretch" Margin="4"/>
+
         <CheckBox Margin="4" Content="{lex:Loc USBBackup:StringResource:SettingsWindow_WatchFolders}"
                   IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=WatchBackupFolders, Mode=TwoWay}"/>
-        <CheckBox Margin="4" Content="{lex:Loc USBBackup:StringResource:SettingsWindow_CleanupFolders}"
+        <CheckBox x:Name="_cleanupCheckBox" Margin="4" Content="{lex:Loc USBBackup:StringResource:SettingsWindow_CleanupFolders}"
                   IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=CleanupRemovedFile, Mode=TwoWay}" />
         <CheckBox x:Name="_backupOnIntervalsCheckBox" Margin="4" 
                   Content="{lex:Loc USBBackup:StringResource:SettingsWindow_BackupOnInterval}"

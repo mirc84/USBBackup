@@ -210,4 +210,16 @@
   <data name="MainWindow_ClosingSaveQuestion_Caption" xml:space="preserve">
     <value>Änderungen speichern?</value>
   </data>
+  <data name="SettingsWindow_NotifyBackupFinished" xml:space="preserve">
+    <value>Informiere über beendete Backups</value>
+  </data>
+  <data name="SettingsWindow_NotifyBackupStarted" xml:space="preserve">
+    <value>Informiere über gestartete Backups</value>
+  </data>
+  <data name="SettingsWindow_NotifyCleanupFinished" xml:space="preserve">
+    <value>Informiere über beendete Bereinigung</value>
+  </data>
+  <data name="SettingsWindow_NotifyCleanupStarted" xml:space="preserve">
+    <value>Informiere über gestartete Bereinigung</value>
+  </data>
 </root>

@@ -121,22 +121,34 @@ namespace USBBackupGUI
 
         internal void OnNotifyCleanupStarted(IBackup backup)
         {
+            if (!USBBackup.Properties.Settings.Default.NotifyCleanupStarted)
+                return;
+
             _icon.ShowBalloonTip(500, new Loc("TrayIcon_CleanUpStarted_Caption"), new Loc("TrayIcon_CleanUpStarted", backup.TargetPath), ToolTipIcon.Info);
         }
 
         internal void OnNotifyCleanupFinished(IBackup backup)
         {
+            if (!USBBackup.Properties.Settings.Default.NotifyCleanupFinished)
+                return;
+
             _icon.ShowBalloonTip(500, new Loc("TrayIcon_CleanUpFinished_Caption"), new Loc("TrayIcon_CleanUpFinished", backup.TargetPath), ToolTipIcon.Info);
         }
 
         internal void OnNotifyBackupFinished(IBackup backup)
         {
+            if (!USBBackup.Properties.Settings.Default.NotifyBackupFinished)
+                return;
+
             _icon.ShowBalloonTip(500, new Loc("TrayIcon_BackupFinished_Caption"), new Loc("TrayIcon_BackupFinished", backup.TargetPath), ToolTipIcon.Info);
 
         }
 
         internal void OnNotifyBackupStarted(IBackup backup)
         {
+            if (!USBBackup.Properties.Settings.Default.NotifyBackupStarted)
+                return;
+
             _icon.ShowBalloonTip(500, new Loc("TrayIcon_BackupStarted_Caption"), new Loc("TrayIcon_BackupStarted", backup.TargetPath), ToolTipIcon.Info);
         }
 

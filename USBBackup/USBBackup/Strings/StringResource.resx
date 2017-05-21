@@ -210,4 +210,16 @@
   <data name="MainWindow_ClosingSaveQuestion_Caption" xml:space="preserve">
     <value>Save changes?</value>
   </data>
+  <data name="SettingsWindow_NotifyBackupStarted" xml:space="preserve">
+    <value>Notify about a started backup</value>
+  </data>
+  <data name="SettingsWindow_NotifyBackupFinished" xml:space="preserve">
+    <value>Notify about a completed backup</value>
+  </data>
+  <data name="SettingsWindow_NotifyCleanupStarted" xml:space="preserve">
+    <value>Notify about a started cleanup</value>
+  </data>
+  <data name="SettingsWindow_NotifyCleanupFinished" xml:space="preserve">
+    <value>Notify about a completed cleanup</value>
+  </data>
 </root>

@@ -169,6 +169,42 @@ namespace USBBackup.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Notify about a completed backup.
+        /// </summary>
+        public static string SettingsWindow_NotifyBackupFinished {
+            get {
+                return ResourceManager.GetString("SettingsWindow_NotifyBackupFinished", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Notify about a started backup.
+        /// </summary>
+        public static string SettingsWindow_NotifyBackupStarted {
+            get {
+                return ResourceManager.GetString("SettingsWindow_NotifyBackupStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Notify about a completed cleanup.
+        /// </summary>
+        public static string SettingsWindow_NotifyCleanupFinished {
+            get {
+                return ResourceManager.GetString("SettingsWindow_NotifyCleanupFinished", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Notify about a started cleanup.
+        /// </summary>
+        public static string SettingsWindow_NotifyCleanupStarted {
+            get {
+                return ResourceManager.GetString("SettingsWindow_NotifyCleanupStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Monitor backup folders for changes.
         /// </summary>
         public static string SettingsWindow_WatchFolders {
