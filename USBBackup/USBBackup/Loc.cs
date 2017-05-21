@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using WPFLocalizeExtension.Engine;
 using WPFLocalizeExtension.Extensions;
 
@@ -20,8 +22,8 @@ namespace USBBackup
             get { return CultureInfo.CurrentCulture; }
             set
             {
-                CultureInfo.DefaultThreadCurrentCulture = value;
                 LocalizeDictionary.Instance.Culture = value;
+                CultureInfo.DefaultThreadCurrentCulture = value;
             }
         }
 
@@ -32,7 +34,8 @@ namespace USBBackup
 
         public override string ToString()
         {
-            return string.Format(LocExtension.GetLocalizedValue<string>(_key), _formatArguments);
+            var locString = LocExtension.GetLocalizedValue<string>(_key);
+            return string.Format(locString, _formatArguments);
         }
     }
 }

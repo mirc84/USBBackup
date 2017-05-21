@@ -64,6 +64,10 @@ namespace USBBackupGUI
                 BackupOnIntervals = USBBackup.Properties.Settings.Default.HandleBackupOnInterval,
                 WatchBackupFolders = USBBackup.Properties.Settings.Default.WatchBackupSources,
                 CleanupRemovedFile = USBBackup.Properties.Settings.Default.CleanupRemovedFile,
+                NotifyBackupFinished = USBBackup.Properties.Settings.Default.NotifyBackupFinished,
+                NotifyBackupStarted = USBBackup.Properties.Settings.Default.NotifyBackupStarted,
+                NotifyCleanupFinished = USBBackup.Properties.Settings.Default.NotifyCleanupFinished,
+                NotifyCleanupStarted = USBBackup.Properties.Settings.Default.NotifyCleanupStarted,
             };
 
             if (win.ShowDialog().GetValueOrDefault())
@@ -73,6 +77,10 @@ namespace USBBackupGUI
                 USBBackup.Properties.Settings.Default.HandleBackupOnInterval = win.BackupOnIntervals;
                 USBBackup.Properties.Settings.Default.WatchBackupSources = win.WatchBackupFolders;
                 USBBackup.Properties.Settings.Default.CleanupRemovedFile = win.CleanupRemovedFile;
+                USBBackup.Properties.Settings.Default.NotifyBackupFinished = win.NotifyBackupFinished;
+                USBBackup.Properties.Settings.Default.NotifyBackupStarted = win.NotifyBackupStarted;
+                USBBackup.Properties.Settings.Default.NotifyCleanupFinished = win.NotifyCleanupFinished;
+                USBBackup.Properties.Settings.Default.NotifyCleanupStarted = win.NotifyCleanupStarted;
                 USBBackup.Properties.Settings.Default.Language = Loc.CurrentCulture.Name;
                 USBBackup.Properties.Settings.Default.Save();
             }

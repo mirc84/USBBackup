@@ -17,15 +17,7 @@ namespace USBBackupGUI.Controls
         {
             InitializeComponent();
 
-            var cultures = new HashSet<CultureInfo>
-            {
-                CultureInfo.GetCultureInfo("en-US")
-            };
-            foreach (var culture in LocalizeDictionary.Instance.DefaultProvider.AvailableCultures.Where(x => x != CultureInfo.InvariantCulture))
-            {
-                cultures.Add(culture);
-            }
-            _languageComboBox.ItemsSource = cultures;
+            _languageComboBox.ItemsSource = LocalizeDictionary.Instance.DefaultProvider.AvailableCultures.Where(x => x != CultureInfo.InvariantCulture).ToList();
             SelectedLanguage = Loc.CurrentCulture;
         }
         

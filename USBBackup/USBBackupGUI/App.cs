@@ -21,10 +21,18 @@ namespace USBBackupGUI
         public static int Main(params string[] args)
         {
             var app = new App();
+            
+            app.Run();
 
+            return 0;
+        }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
             try
             {
-                if (USBBackup.Properties.Settings.Default.Language == null)
+                if (string.IsNullOrEmpty(USBBackup.Properties.Settings.Default.Language))
                 {
                     Loc.CurrentCulture = CultureInfo.CurrentUICulture;
                     USBBackup.Properties.Settings.Default.Language = Loc.CurrentCulture.Name;
@@ -40,14 +48,6 @@ namespace USBBackupGUI
                 Loc.CurrentCulture = CultureInfo.CurrentUICulture;
             }
 
-            app.Run();
-
-            return 0;
-        }
-
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            base.OnStartup(e);
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             _watcher = new USBWatcher();

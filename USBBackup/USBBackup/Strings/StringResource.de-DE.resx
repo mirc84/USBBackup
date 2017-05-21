@@ -222,4 +222,28 @@
   <data name="SettingsWindow_NotifyCleanupStarted" xml:space="preserve">
     <value>Informiere über gestartete Bereinigung</value>
   </data>
+  <data name="MainWindow_Tooltip_AddBackup" xml:space="preserve">
+    <value>Fügt ein neues Backup Profil für dieses Laufwerk hinzu.</value>
+  </data>
+  <data name="MainWindow_Tooltip_CancelBackup" xml:space="preserve">
+    <value>Bricht das laufende Backup ab</value>
+  </data>
+  <data name="MainWindow_Tooltip_DeleteBackup" xml:space="preserve">
+    <value>Löscht dieses Backup Profil</value>
+  </data>
+  <data name="MainWindow_Tooltip_PauseBackup" xml:space="preserve">
+    <value>Pausiert das laufende Backup</value>
+  </data>
+  <data name="MainWindow_Tooltip_RunAllBackups" xml:space="preserve">
+    <value>Startet alle aktiven Backups</value>
+  </data>
+  <data name="MainWindow_Tooltip_RunBackup" xml:space="preserve">
+    <value>Startet dieses Backup</value>
+  </data>
+  <data name="MainWindow_Tooltip_Save" xml:space="preserve">
+    <value>Speichert alle Backup Profile</value>
+  </data>
+  <data name="MainWindow_Tooltip_Settings" xml:space="preserve">
+    <value>Öffnet das Fenster zum Bearbeiten der Programmeinstellungen</value>
+  </data>
 </root>
