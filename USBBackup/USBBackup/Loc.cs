@@ -22,9 +22,8 @@ namespace USBBackup
             get { return CultureInfo.CurrentCulture; }
             set
             {
-                var culture = value;
-                LocalizeDictionary.Instance.SetCultureCommand.Execute(culture);
-                CultureInfo.DefaultThreadCurrentCulture = culture;
+                LocalizeDictionary.Instance.Culture = value;
+                CultureInfo.DefaultThreadCurrentCulture = value;
             }
         }
 

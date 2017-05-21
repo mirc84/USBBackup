@@ -102,32 +102,44 @@
                                                                           SelectedPath="{Binding TargetPath, Mode=TwoWay}"/>
 
                                             <Button Margin="4" Grid.Row="2" Grid.Column="3"
+                                                    ToolTip="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_RunBackup}"
                                                     Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.RunPauseResumeBackupCommand}"
                                                     CommandParameter="{Binding }">
                                                 <Button.Style>
                                                     <Style TargetType="Button" BasedOn="{StaticResource _quadraticButtonStyle}">
-                                                        <Setter Property="ToolTip" Value="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_RunBackup}"/>
-                                                        <Setter Property="Content">
-                                                            <Setter.Value>
-                                                                <Image Source="/Resources/Images/play-icon.png" />
-                                                            </Setter.Value>
-                                                        </Setter>
+                                                        <Setter Property="Visibility" Value="Visible"/>
                                                         <Style.Triggers>
                                                             <MultiDataTrigger>
                                                                 <MultiDataTrigger.Conditions>
                                                                     <Condition Binding="{Binding IsRunning}" Value="True" />
                                                                     <Condition Binding="{Binding IsPaused}" Value="False" />
                                                                 </MultiDataTrigger.Conditions>
-                                                                <Setter Property="ToolTip" Value="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_PauseBackup}"/>
-                                                                <Setter Property="Content">
-                                                                    <Setter.Value>
-                                                                        <Image Source="/Resources/Images/pause-icon.png" />
-                                                                    </Setter.Value>
-                                                                </Setter>
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
                                                             </MultiDataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Button.Style>
+                                                <Image Source="/Resources/Images/play-icon.png" />
+                                            </Button>
+                                            <Button Margin="4" Grid.Row="2" Grid.Column="3"
+                                                    ToolTip="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_PauseBackup}"
+                                                    Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.RunPauseResumeBackupCommand}"
+                                                    CommandParameter="{Binding }">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource _quadraticButtonStyle}">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <MultiDataTrigger>
+                                                                <MultiDataTrigger.Conditions>
+                                                                    <Condition Binding="{Binding IsRunning}" Value="True" />
+                                                                    <Condition Binding="{Binding IsPaused}" Value="False" />
+                                                                </MultiDataTrigger.Conditions>
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </MultiDataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                                <Image Source="/Resources/Images/pause-icon.png" />
                                             </Button>
                                             <Button Margin="4" Grid.Row="2" Grid.Column="4"
                                                     ToolTip="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_CancelBackup}"
