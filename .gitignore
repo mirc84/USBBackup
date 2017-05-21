@@ -4,3 +4,8 @@
 /USBBackup/USBBackup/bin
 /USBBackup/USBBackup/obj
 /USBBackup/.idea/*
+/USBBackup/USBBackupGUI/bin
+/USBBackup/USBBackupGUI/obj
+/USBBackup/packages
+/USBBackup/USBBackupGUI/*.user
+/USBBackup/.vs/USBBackup/v15/*.suo

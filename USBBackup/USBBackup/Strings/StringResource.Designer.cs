@@ -124,6 +124,78 @@ namespace USBBackup.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add a new backup profile for this drive.
+        /// </summary>
+        public static string MainWindow_Tooltip_AddBackup {
+            get {
+                return ResourceManager.GetString("MainWindow_Tooltip_AddBackup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel running backup..
+        /// </summary>
+        public static string MainWindow_Tooltip_CancelBackup {
+            get {
+                return ResourceManager.GetString("MainWindow_Tooltip_CancelBackup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Delete this backup profile.
+        /// </summary>
+        public static string MainWindow_Tooltip_DeleteBackup {
+            get {
+                return ResourceManager.GetString("MainWindow_Tooltip_DeleteBackup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause running backup.
+        /// </summary>
+        public static string MainWindow_Tooltip_PauseBackup {
+            get {
+                return ResourceManager.GetString("MainWindow_Tooltip_PauseBackup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start all active backups.
+        /// </summary>
+        public static string MainWindow_Tooltip_RunAllBackups {
+            get {
+                return ResourceManager.GetString("MainWindow_Tooltip_RunAllBackups", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start this backup.
+        /// </summary>
+        public static string MainWindow_Tooltip_RunBackup {
+            get {
+                return ResourceManager.GetString("MainWindow_Tooltip_RunBackup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save all backup profiles.
+        /// </summary>
+        public static string MainWindow_Tooltip_Save {
+            get {
+                return ResourceManager.GetString("MainWindow_Tooltip_Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open the window to modify the application settings.
+        /// </summary>
+        public static string MainWindow_Tooltip_Settings {
+            get {
+                return ResourceManager.GetString("MainWindow_Tooltip_Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Run backups in fix intervals.
         /// </summary>
         public static string SettingsWindow_BackupOnInterval {

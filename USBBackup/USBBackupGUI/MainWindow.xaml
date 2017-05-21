@@ -38,15 +38,18 @@
 
         <UniformGrid Rows="1" Height="50" HorizontalAlignment="Left" >
             <Button Margin="4" VerticalAlignment="Stretch" HorizontalAlignment="Left" Command="{Binding SaveCommand}"
-                        Style="{StaticResource _quadraticButtonStyle}">
+                    ToolTip="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_Save}"
+                    Style="{StaticResource _quadraticButtonStyle}">
                 <Image Source="/Resources/Images/save-icon.png" />
             </Button>
             <Button Margin="4" VerticalAlignment="Stretch" Command="{Binding RunAllBackupsCommand}" 
-                        Style="{StaticResource _quadraticButtonStyle}">
+                    ToolTip="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_RunAllBackups}"
+                    Style="{StaticResource _quadraticButtonStyle}">
                 <Image Source="/Resources/Images/play-icon.png" />
             </Button>
             <Button Margin="4" VerticalAlignment="Stretch" Click="SettingsButton_Click"
-                        Style="{StaticResource _quadraticButtonStyle}">
+                    ToolTip="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_Settings}"
+                    Style="{StaticResource _quadraticButtonStyle}">
                 <Image Source="/Resources/Images/settings-icon.png" />
             </Button>
         </UniformGrid>
@@ -103,6 +106,7 @@
                                                     CommandParameter="{Binding }">
                                                 <Button.Style>
                                                     <Style TargetType="Button" BasedOn="{StaticResource _quadraticButtonStyle}">
+                                                        <Setter Property="ToolTip" Value="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_RunBackup}"/>
                                                         <Setter Property="Content">
                                                             <Setter.Value>
                                                                 <Image Source="/Resources/Images/play-icon.png" />
@@ -114,6 +118,7 @@
                                                                     <Condition Binding="{Binding IsRunning}" Value="True" />
                                                                     <Condition Binding="{Binding IsPaused}" Value="False" />
                                                                 </MultiDataTrigger.Conditions>
+                                                                <Setter Property="ToolTip" Value="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_PauseBackup}"/>
                                                                 <Setter Property="Content">
                                                                     <Setter.Value>
                                                                         <Image Source="/Resources/Images/pause-icon.png" />
@@ -125,12 +130,14 @@
                                                 </Button.Style>
                                             </Button>
                                             <Button Margin="4" Grid.Row="2" Grid.Column="4"
+                                                    ToolTip="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_CancelBackup}"
                                                     IsEnabled="{Binding IsRunning}" Style="{StaticResource _quadraticButtonStyle}"
                                                     Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.CancelBackupCommand}"
                                                     CommandParameter="{Binding }">
                                                 <Image Source="/Resources/Images/stop-icon.png" />
                                             </Button>
                                             <Button Margin="4" Grid.Row="2" Grid.Column="5"
+                                                    ToolTip="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_DeleteBackup}"
                                                     Style="{StaticResource _quadraticButtonStyle}"
                                                     Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.RemoveBackupCommand}"
                                                     CommandParameter="{Binding }">
@@ -142,6 +149,7 @@
                             </ItemsControl>
 
                             <Button Margin="4" Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.AddBackupCommand}"
+                                    ToolTip="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_AddBackup}"
                                     CommandParameter="{Binding }">
                                 <Image Source="/Resources/Images/add-icon.png" Height="32" Width="32" />
                             </Button>
