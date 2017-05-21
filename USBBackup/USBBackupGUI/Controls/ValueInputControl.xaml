@@ -11,7 +11,7 @@
             <local:IntToStringConverter x:Key="intToStringConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <TextBox Margin="2" 
+    <TextBox Margin="2" Padding="4"
         Text="{Binding RelativeSource={RelativeSource 
                                             FindAncestor, AncestorType=local:ValueInputControl},
                             Path=Value, Mode=TwoWay, 

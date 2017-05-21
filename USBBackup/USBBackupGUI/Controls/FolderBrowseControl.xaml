@@ -12,11 +12,12 @@
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <TextBox Margin="2" MinWidth="100"
+        <TextBox Margin="4" MinWidth="100" Padding="4" FontSize="14"
                  VerticalContentAlignment="Center"
                  Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:FolderBrowseControl}, Path=SelectedPath, Mode=TwoWay}"></TextBox>
-        <Button Margin="2" Grid.Column="1" 
-                Content="Open" 
-                Click="OpenButton_OnClick"></Button>
+        <Button Margin="4" Grid.Column="1" 
+                Click="OpenButton_OnClick">
+            <Image Source="/Resources/Images/Folder-icon.png" />
+        </Button>
     </Grid>
 </UserControl>

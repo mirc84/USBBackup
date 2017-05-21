@@ -3,26 +3,60 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:lex="http://wpflocalizeextension.codeplex.com"
         xmlns:local="clr-namespace:USBBackupGUI.Controls"
         mc:Ignorable="d"
         Title="SettingsWindow" Height="300" Width="300"
         SizeToContent="WidthAndHeight"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+        Icon="/Resources/Images/Hopstarter-Soft-Scraps-USB.ico">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/USBBackupGUI;component/Themes/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <StackPanel>
-        <CheckBox Margin="4" Content="Watch backup folders for changes"
+        <StackPanel Orientation="Horizontal">
+            <Label Content="{lex:Loc USBBackup:StringResource:SettingsWindow_Language}" />
+            <ComboBox x:Name="_languageComboBox" Margin="4"
+                      SelectedItem="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=SelectedLanguage, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate DataType="CultureInfo">
+                        <TextBlock Text="{Binding NativeName}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+        </StackPanel>
+        <CheckBox Margin="4" Content="{lex:Loc USBBackup:StringResource:SettingsWindow_NotifyBackupStarted}"
+                  IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=NotifyBackupStarted, Mode=TwoWay}"/>
+        <CheckBox Margin="4" Content="{lex:Loc USBBackup:StringResource:SettingsWindow_NotifyBackupFinished}"
+                  IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=NotifyBackupFinished, Mode=TwoWay}"/>
+        <CheckBox Margin="4" Content="{lex:Loc USBBackup:StringResource:SettingsWindow_NotifyCleanupStarted}"
+                  IsEnabled="{Binding ElementName=_cleanupCheckBox, Path=IsChecked}"
+                  IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=NotifyCleanupStarted, Mode=TwoWay}"/>
+        <CheckBox Margin="4" Content="{lex:Loc USBBackup:StringResource:SettingsWindow_NotifyCleanupFinished}"
+                  IsEnabled="{Binding ElementName=_cleanupCheckBox, Path=IsChecked}"
+                  IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=NotifyCleanupFinished, Mode=TwoWay}"/>
+
+        <Separator HorizontalAlignment="Stretch" Margin="4"/>
+
+        <CheckBox Margin="4" Content="{lex:Loc USBBackup:StringResource:SettingsWindow_WatchFolders}"
                   IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=WatchBackupFolders, Mode=TwoWay}"/>
-        <CheckBox Margin="4" Content="Run backups in fix intervals"
-                  IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=BackupOnIntervals, Mode=TwoWay}" />
-        <CheckBox Margin="4" Content="Clean up backup directories"
+        <CheckBox x:Name="_cleanupCheckBox" Margin="4" Content="{lex:Loc USBBackup:StringResource:SettingsWindow_CleanupFolders}"
                   IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=CleanupRemovedFile, Mode=TwoWay}" />
-        
-        <Label Content="Backup Interval" Margin="4" />
-        <local:TimeSpanInputControl Margin="4" 
+        <CheckBox x:Name="_backupOnIntervalsCheckBox" Margin="4" 
+                  Content="{lex:Loc USBBackup:StringResource:SettingsWindow_BackupOnInterval}"
+                  IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=BackupOnIntervals, Mode=TwoWay}" />
+
+        <local:TimeSpanInputControl Margin="4,0,4,4" IsEnabled="{Binding ElementName=_backupOnIntervalsCheckBox, Path=IsChecked}"
                                     TimeSpan="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:SettingsWindow}, Path=BackupInterval, Mode=TwoWay}" />
 
-        <StackPanel Orientation="Horizontal">
-            <Button Margin="4" Content="Save" Click="SaveButton_Click" />
-            <Button Margin="4" Content="Cancel" Click="CancelButton_Click" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Margin="4" Content="{lex:Loc USBBackup:StringResource:Button_Save}" Click="SaveButton_Click" />
+            <Button Margin="4" Content="{lex:Loc USBBackup:StringResource:Button_Cancel}" Click="CancelButton_Click" />
         </StackPanel>
     </StackPanel>
 </Window>

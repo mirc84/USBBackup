@@ -70,5 +70,65 @@ namespace USBBackup.Properties {
                 this["CleanupRemovedFile"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("en-US")]
+        public string Language {
+            get {
+                return ((string)(this["Language"]));
+            }
+            set {
+                this["Language"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool NotifyBackupStarted {
+            get {
+                return ((bool)(this["NotifyBackupStarted"]));
+            }
+            set {
+                this["NotifyBackupStarted"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool NotifyBackupFinished {
+            get {
+                return ((bool)(this["NotifyBackupFinished"]));
+            }
+            set {
+                this["NotifyBackupFinished"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool NotifyCleanupStarted {
+            get {
+                return ((bool)(this["NotifyCleanupStarted"]));
+            }
+            set {
+                this["NotifyCleanupStarted"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool NotifyCleanupFinished {
+            get {
+                return ((bool)(this["NotifyCleanupFinished"]));
+            }
+            set {
+                this["NotifyCleanupFinished"] = value;
+            }
+        }
     }
 }

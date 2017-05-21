@@ -117,20 +117,109 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="Hopstarter_Soft_Scraps_USB" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\hopstarter-soft-scraps-usb.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="ApplicationTitle" xml:space="preserve">
+    <value>USB Backup</value>
   </data>
-  <data name="pause_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\pause-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="BackupSource" xml:space="preserve">
+    <value>Source</value>
   </data>
-  <data name="play_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\play-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="BackupTarget" xml:space="preserve">
+    <value>Target</value>
   </data>
-  <data name="close_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\close-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Button_Cancel" xml:space="preserve">
+    <value>Cancel</value>
   </data>
-  <data name="stop_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\stop-icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Button_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="SettingsWindow_BackupOnInterval" xml:space="preserve">
+    <value>Run backups in fix intervals</value>
+  </data>
+  <data name="SettingsWindow_CleanupFolders" xml:space="preserve">
+    <value>Clean up backup directories</value>
+  </data>
+  <data name="SettingsWindow_WatchFolders" xml:space="preserve">
+    <value>Monitor backup folders for changes</value>
+  </data>
+  <data name="UserChoice_RemoveBackup" xml:space="preserve">
+    <value>Do you want to remove this backup profile?</value>
+  </data>
+  <data name="UserChoiceCaption_RemoveBackup" xml:space="preserve">
+    <value>Remove backup profile?</value>
+  </data>
+  <data name="SettingsWindow_Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="UserNotification_BackupsSaved" xml:space="preserve">
+    <value>Backup profiles successfully saved.</value>
+  </data>
+  <data name="UserNotificationCaption_BackupsSaved" xml:space="preserve">
+    <value>Backups profile saved</value>
+  </data>
+  <data name="TrayIcon_RunBackups" xml:space="preserve">
+    <value>Run Backups</value>
+  </data>
+  <data name="TrayIcon_PauseBackups" xml:space="preserve">
+    <value>Pause Backups</value>
+  </data>
+  <data name="TrayIcon_CancelBackups" xml:space="preserve">
+    <value>Cancel Backups</value>
+  </data>
+  <data name="TrayIcon_Open" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="TrayIcon_Close" xml:space="preserve">
+    <value>Shutdown</value>
+  </data>
+  <data name="TrayIcon_CleanUpStarted" xml:space="preserve">
+    <value>Clean up of {0} started.</value>
+  </data>
+  <data name="TrayIcon_CleanUpStarted_Caption" xml:space="preserve">
+    <value>Clean up started</value>
+  </data>
+  <data name="TrayIcon_CleanUpFinished" xml:space="preserve">
+    <value>Clean up of {0} finished.</value>
+  </data>
+  <data name="TrayIcon_CleanUpFinished_Caption" xml:space="preserve">
+    <value>Clean up finished</value>
+  </data>
+  <data name="TrayIcon_BackupStarted" xml:space="preserve">
+    <value>Starting backup to {0}.</value>
+  </data>
+  <data name="TrayIcon_BackupStarted_Caption" xml:space="preserve">
+    <value>Backup started</value>
+  </data>
+  <data name="TrayIcon_BackupFinished" xml:space="preserve">
+    <value>Backup to {0} finished.</value>
+  </data>
+  <data name="TrayIcon_BackupFinished_Caption" xml:space="preserve">
+    <value>Backup finished</value>
+  </data>
+  <data name="TrayIcon_ResumeBackups" xml:space="preserve">
+    <value>Resume backups</value>
+  </data>
+  <data name="SettingsWindow_CancelQuestion" xml:space="preserve">
+    <value>Do you want to reject changes?</value>
+  </data>
+  <data name="SettingsWindow_CancelQuestion_Caption" xml:space="preserve">
+    <value>Reject changes?</value>
+  </data>
+  <data name="MainWindow_ClosingSaveQuestion" xml:space="preserve">
+    <value>Do you want to save your changes?</value>
+  </data>
+  <data name="MainWindow_ClosingSaveQuestion_Caption" xml:space="preserve">
+    <value>Save changes?</value>
+  </data>
+  <data name="SettingsWindow_NotifyBackupStarted" xml:space="preserve">
+    <value>Notify about a started backup</value>
+  </data>
+  <data name="SettingsWindow_NotifyBackupFinished" xml:space="preserve">
+    <value>Notify about a completed backup</value>
+  </data>
+  <data name="SettingsWindow_NotifyCleanupStarted" xml:space="preserve">
+    <value>Notify about a started cleanup</value>
+  </data>
+  <data name="SettingsWindow_NotifyCleanupFinished" xml:space="preserve">
+    <value>Notify about a completed cleanup</value>
   </data>
 </root>
