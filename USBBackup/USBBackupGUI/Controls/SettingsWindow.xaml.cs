@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using USBBackup;
+using WPFLocalizeExtension.Engine;
 
 namespace USBBackupGUI.Controls
 {
@@ -22,8 +25,29 @@ namespace USBBackupGUI.Controls
         public SettingsWindow()
         {
             InitializeComponent();
+
+            var cultures = new HashSet<CultureInfo>
+            {
+                CultureInfo.GetCultureInfo("en-US")
+            };
+            foreach (var culture in LocalizeDictionary.Instance.DefaultProvider.AvailableCultures.Where(x => x != CultureInfo.InvariantCulture))
+            {
+                cultures.Add(culture);
+            }
+            _languageComboBox.ItemsSource = cultures;
+            SelectedLanguage = Loc.CurrentCulture;
         }
 
+
+        public CultureInfo SelectedLanguage
+        {
+            get { return (CultureInfo)GetValue(LanguageProperty); }
+            set { SetValue(LanguageProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Language.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty LanguageProperty =
+            DependencyProperty.Register("Language", typeof(CultureInfo), typeof(SettingsWindow), new PropertyMetadata(default(CultureInfo)));
 
 
         public TimeSpan BackupInterval
@@ -79,11 +103,11 @@ namespace USBBackupGUI.Controls
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            var choice = MessageBox.Show("Do you want to close without saving?", "Reject Changes?", MessageBoxButton.OKCancel);
+            var choice = MessageBox.Show(new Loc("SettingsWindow_CancelQuestion"), new Loc("SettingsWindow_CancelQuestion_Caption"), MessageBoxButton.OKCancel);
             if (choice != MessageBoxResult.OK)
                 return;
 
             DialogResult = false;
         }
-    }
+    }    
 }

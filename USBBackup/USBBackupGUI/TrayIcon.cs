@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Drawing;
 using System.Windows;
 using System.Windows.Forms;
 using USBBackup;
-using USBBackupGUI.Properties;
+using USBBackupGUI.Resources;
 
 namespace USBBackupGUI
 {
@@ -21,7 +20,7 @@ namespace USBBackupGUI
             _window = window;
             _icon = new NotifyIcon()
             {
-                Icon = (Icon)Resources.Hopstarter_Soft_Scraps_USB,
+                Icon = ImageResource.Hopstarter_Soft_Scraps_USB1,
                 ContextMenu = new ContextMenu(),
                 Visible = true
             };
@@ -59,37 +58,32 @@ namespace USBBackupGUI
         {
             var runItem = new MenuItem()
             {
-                Name = "Run Backup",
-                Text = "Run",
+                Text = new Loc("TrayIcon_RunBackups"),
             };
             runItem.Click += OnRunBackupRequested;
 
             _pauseItem = new MenuItem()
             {
-                Name = "Pause Backup",
-                Text = "Pause",
+                Text = new Loc("TrayIcon_PauseBackups"),
             };
             _pauseItem.Click += OnPauseBackupsRequested;
 
             _cancelItem = new MenuItem()
             {
-                Name = "Cancel Backup",
-                Text = "Cancel",
+                Text = new Loc("TrayIcon_CancelBackups")
             };
             _cancelItem.Click += OnCancelBackupsRequested;
 
             var showWindowItem = new MenuItem()
             {
-                Name = "Open",
-                Text = "Open",
+                Text = new Loc("TrayIcon_Open"),
                 DefaultItem = true
             };
             showWindowItem.Click += (_, __) => ShowWindow();
 
             var closeItem = new MenuItem()
             {
-                Name = "Close",
-                Text = "Close",
+                Text = new Loc("TrayIcon_Close")
             };
             closeItem.Click += (_, __) => _window.Close();
 
@@ -112,12 +106,12 @@ namespace USBBackupGUI
                     break;
                 case BackupState.Running:
                     _pauseItem.Enabled = true;
-                    _pauseItem.Text = "Pause";
+                    _pauseItem.Text = new Loc("TrayIcon_PauseBackups");
                     _cancelItem.Enabled = true;
                     break;
                 case BackupState.Paused:
                     _pauseItem.Enabled = true;
-                    _pauseItem.Text = "Resume";
+                    _pauseItem.Text = new Loc("TrayIcon_ResumeBackups");
                     _cancelItem.Enabled = true;
                     break;
                 default:
@@ -127,23 +121,23 @@ namespace USBBackupGUI
 
         internal void OnNotifyCleanupStarted(IBackup backup)
         {
-            _icon.ShowBalloonTip(500, "Clean Up Started", $"Clean up of {backup.TargetPath} started.", ToolTipIcon.Info);
+            _icon.ShowBalloonTip(500, new Loc("TrayIcon_CleanUpStarted_Caption"), new Loc("TrayIcon_CleanUpStarted", backup.TargetPath), ToolTipIcon.Info);
         }
 
         internal void OnNotifyCleanupFinished(IBackup backup)
         {
-            _icon.ShowBalloonTip(500, "Clean Up Finished", $"Clean up of {backup.TargetPath} finished.", ToolTipIcon.Info);
+            _icon.ShowBalloonTip(500, new Loc("TrayIcon_CleanUpFinished_Caption"), new Loc("TrayIcon_CleanUpFinished", backup.TargetPath), ToolTipIcon.Info);
         }
 
         internal void OnNotifyBackupFinished(IBackup backup)
         {
-            _icon.ShowBalloonTip(500, "Backup Finished", $"Backup to {backup.TargetPath} finished.", ToolTipIcon.Info);
+            _icon.ShowBalloonTip(500, new Loc("TrayIcon_BackupFinished_Caption"), new Loc("TrayIcon_BackupFinished", backup.TargetPath), ToolTipIcon.Info);
 
         }
 
         internal void OnNotifyBackupStarted(IBackup backup)
         {
-            _icon.ShowBalloonTip(500, "Starting Backup", $"Starting backup to {backup.TargetPath}.", ToolTipIcon.Info);
+            _icon.ShowBalloonTip(500, new Loc("TrayIcon_BackupStarted_Caption"), new Loc("TrayIcon_BackupStarted", backup.TargetPath), ToolTipIcon.Info);
         }
 
         private void OnCancelBackupsRequested(object sender, EventArgs e)

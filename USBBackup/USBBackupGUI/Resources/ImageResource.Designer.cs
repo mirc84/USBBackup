@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace USBBackupGUI.Properties {
+namespace USBBackupGUI.Resources {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace USBBackupGUI.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    internal class ImageResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources() {
+        internal ImageResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace USBBackupGUI.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("USBBackupGUI.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("USBBackupGUI.Resources.ImageResource", typeof(ImageResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,52 +61,22 @@ namespace USBBackupGUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Bitmap close_icon {
+        internal static System.Drawing.Icon Hopstarter_Soft_Scraps_USB {
             get {
-                object obj = ResourceManager.GetObject("close_icon", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                object obj = ResourceManager.GetObject("Hopstarter-Soft-Scraps-USB", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon Hopstarter_Soft_Scraps_USB {
+        internal static System.Drawing.Icon Hopstarter_Soft_Scraps_USB1 {
             get {
-                object obj = ResourceManager.GetObject("Hopstarter_Soft_Scraps_USB", resourceCulture);
+                object obj = ResourceManager.GetObject("Hopstarter-Soft-Scraps-USB1", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap pause_icon {
-            get {
-                object obj = ResourceManager.GetObject("pause_icon", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap play_icon {
-            get {
-                object obj = ResourceManager.GetObject("play_icon", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap stop_icon {
-            get {
-                object obj = ResourceManager.GetObject("stop_icon", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }

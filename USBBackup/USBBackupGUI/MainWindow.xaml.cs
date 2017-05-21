@@ -6,6 +6,9 @@ using USBBackup.Entities;
 using USBBackupGUI.Controls;
 using System.ComponentModel;
 using System;
+using System.Windows.Data;
+using System.Globalization;
+using USBBackup;
 
 namespace USBBackupGUI
 {
@@ -21,11 +24,12 @@ namespace USBBackupGUI
             InitializeComponent();
             DataContextChanged += OnDataContextChanged;
             Closing += OnClosing;
+
         }
 
         private void OnClosing(object sender, CancelEventArgs args)
         {
-            var choice = MessageBox.Show("Do you want to save your changes?", "Save Changes?", MessageBoxButton.YesNoCancel);
+            var choice = MessageBox.Show(new Loc("MainWindow_ClosingSaveQuestion"), new Loc("MainWindow_ClosingSaveQuestion_Caption"), MessageBoxButton.YesNoCancel);
             if (choice == MessageBoxResult.Yes)
                 _viewModel.SaveCommand.Execute(null);
 
@@ -61,14 +65,30 @@ namespace USBBackupGUI
                 WatchBackupFolders = USBBackup.Properties.Settings.Default.WatchBackupSources,
                 CleanupRemovedFile = USBBackup.Properties.Settings.Default.CleanupRemovedFile,
             };
+
             if (win.ShowDialog().GetValueOrDefault())
             {
+                Loc.CurrentCulture = win.SelectedLanguage;
                 USBBackup.Properties.Settings.Default.BackupInterval = win.BackupInterval;
                 USBBackup.Properties.Settings.Default.HandleBackupOnInterval = win.BackupOnIntervals;
                 USBBackup.Properties.Settings.Default.WatchBackupSources = win.WatchBackupFolders;
                 USBBackup.Properties.Settings.Default.CleanupRemovedFile = win.CleanupRemovedFile;
+                USBBackup.Properties.Settings.Default.Language = Loc.CurrentCulture.Name;
                 USBBackup.Properties.Settings.Default.Save();
             }
+        }
+    }
+
+    class NotNullToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value == null ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }

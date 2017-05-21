@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Threading;
@@ -20,6 +21,24 @@ namespace USBBackupGUI
         public static int Main(params string[] args)
         {
             var app = new App();
+
+            try
+            {
+                if (USBBackup.Properties.Settings.Default.Language == null)
+                {
+                    Loc.CurrentCulture = CultureInfo.CurrentUICulture;
+                    USBBackup.Properties.Settings.Default.Language = Loc.CurrentCulture.Name;
+                    USBBackup.Properties.Settings.Default.Save();
+                }
+                else
+                {
+                    Loc.CurrentCulture = CultureInfo.GetCultureInfo(USBBackup.Properties.Settings.Default.Language);
+                }
+            }
+            catch (Exception)
+            {
+                Loc.CurrentCulture = CultureInfo.CurrentUICulture;
+            }
 
             app.Run();
 

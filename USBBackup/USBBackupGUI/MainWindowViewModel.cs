@@ -79,7 +79,7 @@ namespace USBBackupGUI
             if (drive == null)
                 return;
 
-            var choice = UserChoiceRequested("Do you want to remove this backup?", "Remove Backup?");
+            var choice = UserChoiceRequested(new Loc("UserChoice_RemoveBackup"), new Loc("UserChoiceCaption_RemoveBackup"));
             if (choice != MessageBoxResult.Yes)
                 return;
 
@@ -90,7 +90,7 @@ namespace USBBackupGUI
         private void Save(object obj)
         {
             _usbDeviceRepository.Save();
-            OnUserNotification("Backups successfully saved", "Saved");
+            OnUserNotification(new Loc("UserNotification_BackupsSaved"), new Loc("UserNotificationCaption_BackupsSaved"));
         }
 
         private void RunAllBackups(object obj)
