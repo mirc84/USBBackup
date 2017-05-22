@@ -65,42 +65,61 @@ namespace USBBackup
                     if (!dir.Exists)
                         return;
 
-                    var targetDir = new DirectoryInfo(backup.SourcePath);
-                    if (!targetDir.Exists)
-                        targetDir.Create();
+                    backup.CurrentFile = "Analysing";
 
-                    foreach (var fileInfo in dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
+                    var files = GetUpdatedBackupFiles(backup);
+                    backup.BytesToWrite = files.Keys.Sum(x => x.Length);
+                    backup.WrittenBytes = 0L;
+                    backup.FinishedBytes = 0L;
+                    backup.CurrentFileBytes = 0L;
+                    backup.CurrentFileWrittenBytes = 0L;
+                    foreach (var backupFilePair in files)
                     {
-                        //if (backup.IsPaused)
-                        {
-                            pauseEvent.WaitOne();
-                        }
-                        backup.IsPaused = false;
-                        if (token.Token.IsCancellationRequested)
-                            return;
-
                         try
                         {
-                            var relativePath = fileInfo.FullName.Substring(backup.SourcePath.Length);
-                            backup.CurrentFile = ".." + relativePath;
-                            var targetFileInfo = new FileInfo(string.Concat(backup.TargetPath, relativePath));
+                            pauseEvent.WaitOne();
+                            backup.IsPaused = false;
+                            if (token.Token.IsCancellationRequested)
+                                return;
 
+                            var fileInfo = backupFilePair.Key;
+                            var targetFileInfo = backupFilePair.Value;
+
+                            backup.CurrentFile = ".." + fileInfo.FullName.Substring(backup.SourcePath.Length);
+
+                            var bakPath = targetFileInfo.FullName + ".bak";
+                            if (File.Exists(bakPath))
+                                File.Delete(bakPath);
                             if (!targetFileInfo.Directory.Exists)
                                 targetFileInfo.Directory.Create();
 
-                            if (targetFileInfo.Exists && fileInfo.LastWriteTime == targetFileInfo.LastWriteTime)
-                                continue;
+                            using (var fileStream = new FileStream(fileInfo.FullName, FileMode.Open))
+                            {
+                                backup.CurrentFileBytes = fileStream.Length;
+                                using (var targetFileStream = new FileStream(bakPath, FileMode.Create))
+                                {
+                                    var copyTask = fileStream.CopyToAsync(targetFileStream);
+                                    
+                                    while (!copyTask.IsCompleted)
+                                    {
+                                        backup.WrittenBytes = backup.FinishedBytes + fileStream.Position;
+                                        backup.CurrentFileWrittenBytes = fileStream.Position;
+                                        copyTask.Wait(10);
+                                    }
+                                    targetFileStream.Flush();
+                                }
+                                backup.FinishedBytes += fileStream.Length;
+                            }
 
-                            var targetPath = targetFileInfo.FullName;
-                            var bakPath = targetPath + ".bak";
-                            if (File.Exists(bakPath))
-                                File.Delete(bakPath);
-                            File.Copy(fileInfo.FullName, bakPath);
+                            if (File.Exists(targetFileInfo.FullName))
+                                File.Delete(targetFileInfo.FullName);
 
-                            if (File.Exists(targetPath))
-                                File.Delete(targetPath);
+                            File.Move(bakPath, targetFileInfo.FullName);
+                            targetFileInfo.CreationTime = fileInfo.CreationTime;
+                            targetFileInfo.LastWriteTime = fileInfo.LastWriteTime;
 
-                            File.Move(targetPath + ".bak", targetPath);
+                            backup.CurrentFileBytes = 0L;
+                            backup.CurrentFileWrittenBytes = 0L;
                         }
                         catch (Exception e)
                         {
@@ -117,6 +136,11 @@ namespace USBBackup
                     backup.CurrentFile = null;
                     backup.IsRunning = false;
                     backup.IsPaused = false;
+                    backup.BytesToWrite = 0L;
+                    backup.WrittenBytes = 0L;
+                    backup.FinishedBytes = 0L;
+                    backup.CurrentFileBytes = 0L;
+                    backup.CurrentFileWrittenBytes = 0L;
                     OnBackupFinished(backup);
                 }
             }, token.Token);
@@ -124,6 +148,31 @@ namespace USBBackup
 
             if (USBBackup.Properties.Settings.Default.CleanupRemovedFile)
                 RecycleBackupFiles(backup);
+        }
+
+        private IDictionary<FileInfo, FileInfo> GetUpdatedBackupFiles(IBackup backup)
+        {
+            var updatedFiles = new Dictionary<FileInfo, FileInfo>();
+
+            var dir = new DirectoryInfo(backup.SourcePath);
+            if (!dir.Exists)
+                return updatedFiles;
+
+            var targetDir = new DirectoryInfo(backup.SourcePath);
+            if (!targetDir.Exists)
+                targetDir.Create();
+
+            foreach (var fileInfo in dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
+            {
+                var relativePath = fileInfo.FullName.Substring(backup.SourcePath.Length);
+                var targetFileInfo = new FileInfo(string.Concat(backup.TargetPath, relativePath));
+
+                if (targetFileInfo.Exists && fileInfo.LastWriteTime == targetFileInfo.LastWriteTime)
+                    continue;
+
+                updatedFiles.Add(fileInfo, targetFileInfo);
+            }
+            return updatedFiles;
         }
 
         private void PrepareBackup(IBackup backup, out CancellationTokenSource token, out ManualResetEvent pauseEvent, out Task task)
