@@ -9,6 +9,12 @@
         private bool _isPaused;
         private string _currentFile;
 
+        private long _bytesToWrite;
+        private long _writtenBytes;
+        private long _finishedBytes;
+        private long _currentFileBytes;
+        private long _currentFileWrittenBytes;
+
         public virtual string SourcePath
         {
             get { return _sourcePath; }
@@ -65,6 +71,57 @@
             set
             {
                 _currentFile = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public virtual long BytesToWrite
+        {
+            get { return _bytesToWrite; }
+            set
+            {
+                _bytesToWrite = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public virtual long WrittenBytes
+        {
+            get { return _writtenBytes; }
+            set
+            {
+                _writtenBytes = value;
+                OnPropertyChanged();
+            }
+        }
+
+
+        public virtual long FinishedBytes
+        {
+            get { return _finishedBytes; }
+            set
+            {
+                _finishedBytes = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public virtual long CurrentFileBytes
+        {
+            get { return _currentFileBytes; }
+            set
+            {
+                _currentFileBytes = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public virtual long CurrentFileWrittenBytes
+        {
+            get { return _currentFileWrittenBytes; }
+            set
+            {
+                _currentFileWrittenBytes = value;
                 OnPropertyChanged();
             }
         }
