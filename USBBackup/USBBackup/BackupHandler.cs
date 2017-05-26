@@ -52,6 +52,9 @@ namespace USBBackup
         
         public void HandleBackup(IBackup backup, bool force = false)
         {
+            if (backup.Error != null)
+                return;
+
             if ((!backup.IsEnabled && !force) || backup.IsRunning)
                 return;
 
@@ -232,7 +235,7 @@ namespace USBBackup
 
         public void RecycleBackupFiles(IBackup backup)
         {
-            if (!backup.IsEnabled)
+            if (!backup.IsEnabled || backup.Error != null)
                 return;
 
             PrepareBackup(backup, out CancellationTokenSource token, out ManualResetEvent pauseEvent, out Task task);
@@ -311,6 +314,9 @@ namespace USBBackup
 
         public void HandleBackup(Backup backup, string changedPath)
         {
+            if (backup.Error != null)
+                return;
+
             Task runningTask;
             _tasks.TryGetValue(backup, out runningTask);
             if (runningTask == null)
