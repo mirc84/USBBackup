@@ -246,4 +246,10 @@
   <data name="MainWindow_Tooltip_AddBackup" xml:space="preserve">
     <value>Add a new backup profile for this drive</value>
   </data>
+  <data name="UserChoice_HardCancel_Caption" xml:space="preserve">
+    <value>Cancel?</value>
+  </data>
+  <data name="UserChoice_HardCancel" xml:space="preserve">
+    <value>Do you want to cancel the copy process of the current file?</value>
+  </data>
 </root>

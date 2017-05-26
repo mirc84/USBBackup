@@ -66,7 +66,7 @@ namespace USBBackupGUI
             if (backup == null)
                 return;
 
-            var choice = OnUserChoiceRequested("Cancel copy current file", "Cancel?", MessageBoxButton.YesNoCancel);
+            var choice = OnUserChoiceRequested(new Loc("UserChoice_HardCancel"), new Loc("UserChoice_HardCancel_Caption"), MessageBoxButton.YesNoCancel);
             if (choice == MessageBoxResult.Cancel)
                 return;
 

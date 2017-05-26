@@ -119,7 +119,7 @@ namespace USBBackupGUI
 
         private void OnCancelBackupsRequested(object sender, EventArgs e)
         {
-            var choice = MessageBox.Show("Cancel ", "Cancel", MessageBoxButton.YesNoCancel);
+            var choice = MessageBox.Show(_window, new Loc("UserChoice_HardCancel"), new Loc("UserChoice_HardCancel_Caption"), MessageBoxButton.YesNoCancel);
             if (choice == MessageBoxResult.Cancel)
                 return;
 

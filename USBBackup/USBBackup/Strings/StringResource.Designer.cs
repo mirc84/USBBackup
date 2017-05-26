@@ -412,6 +412,24 @@ namespace USBBackup.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Do you want to cancel the copy process of the current file?.
+        /// </summary>
+        public static string UserChoice_HardCancel {
+            get {
+                return ResourceManager.GetString("UserChoice_HardCancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        public static string UserChoice_HardCancel_Caption {
+            get {
+                return ResourceManager.GetString("UserChoice_HardCancel_Caption", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Do you want to remove this backup profile?.
         /// </summary>
         public static string UserChoice_RemoveBackup {

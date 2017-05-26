@@ -246,4 +246,10 @@
   <data name="MainWindow_Tooltip_Settings" xml:space="preserve">
     <value>Öffnet das Fenster zum Bearbeiten der Programmeinstellungen</value>
   </data>
+  <data name="UserChoice_HardCancel_Caption" xml:space="preserve">
+    <value>Abbrechen?</value>
+  </data>
+  <data name="UserChoice_HardCancel" xml:space="preserve">
+    <value>Möchten Sie den Kopiervorgang der aktuellen Datei abbrechen?</value>
+  </data>
 </root>
