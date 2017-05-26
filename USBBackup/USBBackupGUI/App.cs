@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using USBBackup;
@@ -16,6 +18,12 @@ namespace USBBackupGUI
         private BackupHandler _backupHandler;
         private static MainWindow _window;
         private MainWindowViewModel _viewModel;
+        private TrayIcon _trayIcon;
+
+        public App()
+        {
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+        }
 
         [STAThread]
         public static int Main(params string[] args)
@@ -29,6 +37,14 @@ namespace USBBackupGUI
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            var @event = new EventWaitHandle(false, EventResetMode.ManualReset, "Global_MKayBackupStartup", out bool created);
+            if (!created)
+            {
+                @event.Set();
+                Shutdown();
+                return;
+            }
+
             base.OnStartup(e);
             try
             {
@@ -48,7 +64,6 @@ namespace USBBackupGUI
                 Loc.CurrentCulture = CultureInfo.CurrentUICulture;
             }
 
-            ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             _watcher = new USBWatcher();
             _watcher.Init();
@@ -69,18 +84,32 @@ namespace USBBackupGUI
             _window.ShowInTaskbar = false;
             _window.Closed += Shutdown;
 
-            var trayIcon = new TrayIcon(_window);
-            trayIcon.RunBackupRequested += OnRunBackupRequested;
-            trayIcon.PauseResumeBackupsRequested += OnPauseResumeBackupsRequested;
-            trayIcon.CancelBackupsRequested += OnCancelBackupsRequested;
+            _trayIcon = new TrayIcon(_window);
+            _trayIcon.RunBackupRequested += OnRunBackupRequested;
+            _trayIcon.PauseResumeBackupsRequested += OnPauseResumeBackupsRequested;
+            _trayIcon.CancelBackupsRequested += OnCancelBackupsRequested;
 
-            _backupHandler.BackupStarted += trayIcon.OnNotifyBackupStarted;
-            _backupHandler.BackupFinished += trayIcon.OnNotifyBackupFinished;
-            _backupHandler.CleanupStarted += trayIcon.OnNotifyCleanupStarted;
-            _backupHandler.CleanupFinished += trayIcon.OnNotifyCleanupFinished;
-            _backupHandler.StateChanged += trayIcon.OnStateChanged;
+            _backupHandler.BackupStarted += _trayIcon.OnNotifyBackupStarted;
+            _backupHandler.BackupFinished += _trayIcon.OnNotifyBackupFinished;
+            _backupHandler.CleanupStarted += _trayIcon.OnNotifyCleanupStarted;
+            _backupHandler.CleanupFinished += _trayIcon.OnNotifyCleanupFinished;
+            _backupHandler.StateChanged += _trayIcon.OnStateChanged;
 
             _deviceRepository.Load();
+            WaitStartHandle(@event);
+        }
+
+        private void WaitStartHandle(EventWaitHandle @event)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                while (true)
+                {
+                    @event.WaitOne();
+                    Dispatcher.BeginInvoke(new Action(_trayIcon.ShowWindow));
+                    @event.Reset();
+                }
+            });
         }
 
         private void OnPauseResumeBackupsRequested(object sender, EventArgs e)
@@ -90,7 +119,11 @@ namespace USBBackupGUI
 
         private void OnCancelBackupsRequested(object sender, EventArgs e)
         {
-            _backupHandler.CancelBackups();
+            var choice = MessageBox.Show("Cancel ", "Cancel", MessageBoxButton.YesNoCancel);
+            if (choice == MessageBoxResult.Cancel)
+                return;
+
+            _backupHandler.CancelBackups(choice == MessageBoxResult.Yes);
         }
 
         private void OnRunBackupRequested(object sender, EventArgs e)
@@ -100,7 +133,7 @@ namespace USBBackupGUI
 
         private void Shutdown(object sender, EventArgs eventArgs)
         {
-            _backupHandler.CancelBackups();
+            _backupHandler.CancelBackups(true);
             Shutdown();
         }
     }

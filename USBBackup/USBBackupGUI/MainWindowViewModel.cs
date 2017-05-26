@@ -10,7 +10,7 @@ using USBBackup.Entities;
 
 namespace USBBackupGUI
 {
-    public delegate MessageBoxResult AskUserEventHandler(string message, string caption);
+    public delegate MessageBoxResult AskUserEventHandler(string message, string caption, MessageBoxButton results);
     public delegate void NotifyUserEventHandler(string message, string caption);
 
     class MainWindowViewModel : NotificationObject
@@ -34,9 +34,9 @@ namespace USBBackupGUI
             UsbDevices = new ObservableCollection<DriveNotificationWrapper>(_usbDeviceRepository.USBDevices.Select(x => new DriveNotificationWrapper(x)).ToList());
         }
 
-        protected virtual MessageBoxResult OnUserChoiceRequested(string message, string caption)
+        protected virtual MessageBoxResult OnUserChoiceRequested(string message, string caption, MessageBoxButton? result = null)
         {
-            return (UserChoiceRequested?.Invoke(message, caption)).GetValueOrDefault(MessageBoxResult.No);
+            return (UserChoiceRequested?.Invoke(message, caption, result ?? MessageBoxButton.YesNo)).GetValueOrDefault(MessageBoxResult.No);
         }
 
         protected virtual void OnUserNotification(string message, string caption)
@@ -66,7 +66,11 @@ namespace USBBackupGUI
             if (backup == null)
                 return;
 
-            _backupHandler.CancelBackup(backup);
+            var choice = OnUserChoiceRequested("Cancel copy current file", "Cancel?", MessageBoxButton.YesNoCancel);
+            if (choice == MessageBoxResult.Cancel)
+                return;
+
+            _backupHandler.CancelBackup(backup, choice == MessageBoxResult.Yes);
         }
 
         private void RemoveBackup(object obj)
@@ -79,12 +83,12 @@ namespace USBBackupGUI
             if (drive == null)
                 return;
 
-            var choice = UserChoiceRequested(new Loc("UserChoice_RemoveBackup"), new Loc("UserChoiceCaption_RemoveBackup"));
+            var choice = OnUserChoiceRequested(new Loc("UserChoice_RemoveBackup"), new Loc("UserChoiceCaption_RemoveBackup"));
             if (choice != MessageBoxResult.Yes)
                 return;
 
             drive.Backups.Remove(backup);
-            _backupHandler.CancelBackup(backup);
+            _backupHandler.CancelBackup(backup, true);
         }
 
         private void Save(object obj)
