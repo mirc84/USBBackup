@@ -48,9 +48,9 @@ namespace USBBackupGUI
             MessageBox.Show(message, caption, MessageBoxButton.OK);
         }
 
-        private MessageBoxResult OnUserChoiceRequested(string message, string caption)
+        private MessageBoxResult OnUserChoiceRequested(string message, string caption, MessageBoxButton results)
         {
-            var result = MessageBox.Show(message, caption, MessageBoxButton.YesNo);
+            var result = MessageBox.Show(message, caption, results);
             return result;
         }
         

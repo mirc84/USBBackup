@@ -23,12 +23,12 @@ namespace USBBackupGUI.Controls
         
         public CultureInfo SelectedLanguage
         {
-            get { return (CultureInfo)GetValue(LanguageProperty); }
-            set { SetValue(LanguageProperty, value); }
+            get { return (CultureInfo)GetValue(SelectedLanguageProperty); }
+            set { SetValue(SelectedLanguageProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for Language.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty LanguageProperty =
+        public static readonly DependencyProperty SelectedLanguageProperty =
             DependencyProperty.Register("Language", typeof(CultureInfo), typeof(SettingsWindow), new PropertyMetadata(default(CultureInfo)));
         
         public TimeSpan BackupInterval

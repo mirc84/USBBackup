@@ -184,7 +184,7 @@ namespace USBBackupGUI
             ShowWindow();
         }
 
-        private void ShowWindow()
+        public void ShowWindow()
         {
             if (_window.ShowInTaskbar)
                 return;

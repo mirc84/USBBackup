@@ -16,6 +16,7 @@ namespace USBBackup
     {
         private Dictionary<IBackup, Task> _tasks;
         private Dictionary<IBackup, CancellationTokenSource> _backupCancellationTokens;
+        private Dictionary<IBackup, CancellationTokenSource> _backupPauseCancellationTokens;
         private volatile Dictionary<IBackup, ManualResetEvent> _backupResetEvents;
         private BackupState _state;
 
@@ -24,6 +25,7 @@ namespace USBBackup
             _tasks = new Dictionary<IBackup, Task>();
             _backupCancellationTokens = new Dictionary<IBackup, CancellationTokenSource>();
             _backupResetEvents = new Dictionary<IBackup, ManualResetEvent>();
+            _backupPauseCancellationTokens = new Dictionary<IBackup, CancellationTokenSource>();
         }
 
         public event BackupHandledEventHandler BackupStarted;
@@ -73,6 +75,8 @@ namespace USBBackup
                     backup.FinishedBytes = 0L;
                     backup.CurrentFileBytes = 0L;
                     backup.CurrentFileWrittenBytes = 0L;
+                    var pauseCancellationToken = new CancellationTokenSource();
+                    _backupPauseCancellationTokens[backup] = pauseCancellationToken;
                     foreach (var backupFilePair in files)
                     {
                         try
@@ -93,31 +97,60 @@ namespace USBBackup
                             if (!targetFileInfo.Directory.Exists)
                                 targetFileInfo.Directory.Create();
 
+                            var isCopyFileCompleted = false;
                             using (var fileStream = new FileStream(fileInfo.FullName, FileMode.Open))
                             {
                                 backup.CurrentFileBytes = fileStream.Length;
                                 using (var targetFileStream = new FileStream(bakPath, FileMode.Create))
                                 {
-                                    var copyTask = fileStream.CopyToAsync(targetFileStream);
-                                    
-                                    while (!copyTask.IsCompleted)
+                                    while (!token.Token.IsCancellationRequested && fileStream.Position < fileStream.Length)
                                     {
-                                        backup.WrittenBytes = backup.FinishedBytes + fileStream.Position;
-                                        backup.CurrentFileWrittenBytes = fileStream.Position;
-                                        copyTask.Wait(10);
+                                        try
+                                        {
+                                            if (pauseCancellationToken.IsCancellationRequested)
+                                            {
+                                                pauseCancellationToken = new CancellationTokenSource();
+                                                _backupPauseCancellationTokens[backup] = pauseCancellationToken;
+                                            }
+                                            var copyTask = fileStream.CopyToAsync(targetFileStream, 81920,
+                                                pauseCancellationToken.Token);
+
+                                            while (!copyTask.IsCompleted)
+                                            {
+                                                backup.WrittenBytes = backup.FinishedBytes + fileStream.Position;
+                                                backup.CurrentFileWrittenBytes = fileStream.Position;
+                                                copyTask.Wait(10);
+                                            }
+                                            targetFileStream.Flush();
+                                            if (fileStream.Position >= fileStream.Length)
+                                                break;
+                                        }
+                                        catch (AggregateException ex)
+                                        {
+                                            if (!(ex.InnerException is TaskCanceledException))
+                                                throw;
+                                        }
+
+                                        pauseEvent.WaitOne();
                                     }
-                                    targetFileStream.Flush();
                                 }
+                                isCopyFileCompleted = fileStream.Position == fileStream.Length;
                                 backup.FinishedBytes += fileStream.Length;
                             }
 
-                            if (File.Exists(targetFileInfo.FullName))
-                                File.Delete(targetFileInfo.FullName);
+                            if (isCopyFileCompleted)
+                            {
+                                if (File.Exists(targetFileInfo.FullName))
+                                    File.Delete(targetFileInfo.FullName);
 
-                            File.Move(bakPath, targetFileInfo.FullName);
-                            targetFileInfo.CreationTime = fileInfo.CreationTime;
-                            targetFileInfo.LastWriteTime = fileInfo.LastWriteTime;
-
+                                File.Move(bakPath, targetFileInfo.FullName);
+                                targetFileInfo.CreationTime = fileInfo.CreationTime;
+                                targetFileInfo.LastWriteTime = fileInfo.LastWriteTime;
+                            }
+                            else
+                            {
+                                File.Delete(bakPath);
+                            }
                             backup.CurrentFileBytes = 0L;
                             backup.CurrentFileWrittenBytes = 0L;
                         }
@@ -126,6 +159,7 @@ namespace USBBackup
                             Debugger.Break();
                         }
                     }
+                    _backupPauseCancellationTokens.Remove(backup);
                 }
                 catch (Exception e)
                 {
@@ -378,6 +412,8 @@ namespace USBBackup
         {
             _backupResetEvents.TryGetValue(backup, out ManualResetEvent pauseEvent);
             pauseEvent?.Reset();
+            _backupPauseCancellationTokens.TryGetValue(backup, out CancellationTokenSource pauseCancellationToken);
+            pauseCancellationToken?.Cancel();
             backup.IsPaused = true;
             OnStateChanged();
         }
@@ -400,18 +436,32 @@ namespace USBBackup
             OnStateChanged();
         }
 
-        public void CancelBackup(IBackup backup)
+        public void CancelBackup(IBackup backup, bool hardCancel)
         {
             _backupCancellationTokens.TryGetValue(backup, out CancellationTokenSource cancellationToken);
             cancellationToken?.Cancel();
             _backupResetEvents.TryGetValue(backup, out ManualResetEvent pauseEvent);
             pauseEvent?.Set();
+            if (!hardCancel)
+                return;
+
+            _backupPauseCancellationTokens.TryGetValue(backup, out CancellationTokenSource pauseCancellationToken);
+            pauseCancellationToken.Cancel();
         }
 
-        public void CancelBackups()
+        public void CancelBackups(bool hardCancel)
         {
             foreach (var token in _backupCancellationTokens.Values)
                 token.Cancel();
+
+            if (hardCancel)
+            {
+                foreach (var token in _backupPauseCancellationTokens.Values)
+                {
+                    token.Cancel();
+                }
+            }
+
             foreach (var pauseEvent in _backupResetEvents.Values)
                 pauseEvent.Set();
             foreach (var task in _tasks.Values.ToList())
