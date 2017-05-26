@@ -1,10 +1,13 @@
-﻿namespace USBBackup.Entities
+﻿using USBBackup.Strings;
+
+namespace USBBackup.Entities
 {
     public class Backup : DatabaseModel, IBackup
     {
         private string _sourcePath;
         private string _targetPath;
         private bool _isEnabled;
+        private bool _isInverse;
         private bool _isRunning;
         private bool _isPaused;
         private string _currentFile;
@@ -14,6 +17,8 @@
         private long _finishedBytes;
         private long _currentFileBytes;
         private long _currentFileWrittenBytes;
+
+        public virtual Drive Drive { get; set; }
 
         public virtual string SourcePath
         {
@@ -33,6 +38,12 @@
                 _targetPath = value;
                 OnPropertyChanged();
             }
+        }
+
+        public virtual bool IsInverse
+        {
+            get { return _isInverse; }
+            set { _isInverse = value; }
         }
 
         public virtual bool IsEnabled
@@ -125,6 +136,31 @@
                 OnPropertyChanged();
             }
         }
+
+        protected override string Validate(string columnName)
+        {
+            switch (columnName)
+            {
+                case nameof(SourcePath):
+                    if (SourcePath == null)
+                        return new Loc(nameof(StringResource.Backup_Validation_SourceNotSet));
+                    if (SourcePath.StartsWith(TargetPath) || TargetPath.StartsWith(SourcePath))
+                        return new Loc(nameof(StringResource.Backup_Validation_SourceTargetEquals));
+                    if (!SourcePath.StartsWith(Drive.DriveLetter) && TargetPath != null && !TargetPath.StartsWith(Drive.DriveLetter))
+                        return new Loc(nameof(StringResource.Backup_Validation_NoPathToDevice));
+                    return null;
+                case nameof(TargetPath):
+                    if (TargetPath == null)
+                        return new Loc(nameof(StringResource.Backup_Validation_TargetNotSet));
+                    if (SourcePath.StartsWith(TargetPath) || TargetPath.StartsWith(SourcePath))
+                        return new Loc(nameof(StringResource.Backup_Validation_SourceTargetEquals));
+                    if (!TargetPath.StartsWith(Drive.DriveLetter) && SourcePath != null && !SourcePath.StartsWith(Drive.DriveLetter))
+                        return new Loc(nameof(StringResource.Backup_Validation_NoPathToDevice));
+                    return null;
+                default:
+                    return base.Validate(columnName);
+            }
+        }
     }
 
     public class BackupInfoMap : DatabaseModelMap<Backup>
@@ -134,6 +170,8 @@
             Map(x => x.SourcePath);
             Map(x => x.TargetPath);
             Map(x => x.IsEnabled);
+            Map(x => x.IsInverse);
+            References(x => x.Drive).Column("Drive_id");
         }
     }
 }

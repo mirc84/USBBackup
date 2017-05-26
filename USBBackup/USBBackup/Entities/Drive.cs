@@ -48,7 +48,10 @@ namespace USBBackup.Entities
         {
             foreach (var backup in Backups.Where(x => !string.IsNullOrEmpty(x.SourcePath) && !string.IsNullOrEmpty(x.TargetPath)))
             {
-                backup.TargetPath = DriveLetter + backup.TargetPath.Substring(DriveLetter.Length);
+                if (backup.IsInverse)
+                    backup.SourcePath = DriveLetter + backup.SourcePath.Substring(DriveLetter.Length);
+                else
+                    backup.TargetPath = DriveLetter + backup.TargetPath.Substring(DriveLetter.Length);
             }
         }
     }
@@ -63,7 +66,7 @@ namespace USBBackup.Entities
             Map(x => x.Model);
             Map(x => x.PNPDeviceID);
             Map(x => x.Description);
-            HasMany(x => x.Backups).Not.LazyLoad();
+            HasMany(x => x.Backups).Inverse().KeyColumn("Drive_id").Not.LazyLoad();
         }
     }
 }

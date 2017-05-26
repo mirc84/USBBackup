@@ -102,13 +102,12 @@
 
                                             <Label Grid.Row="3" Grid.Column="1" 
                                                    Content="{lex:Loc USBBackup:StringResource:BackupSource}"></Label>
-                                            <controls:FolderBrowseControl Grid.Row="3" Grid.Column="1"
-                                                                          SelectedPath="{Binding SourcePath, Mode=TwoWay}" />
+                                            <controls:FolderBrowseControl Grid.Row="3" Grid.Column="1" ValueChanged="FolderBrowseControl_ValueChanged"
+                                                                          SelectedPath="{Binding SourcePath, Mode=TwoWay, ValidatesOnDataErrors=True}" />
                                             <Label Grid.Row="3" Grid.Column="2" 
                                                    Content="{lex:Loc USBBackup:StringResource:BackupTarget}"></Label>
-                                            <controls:FolderBrowseControl Grid.Row="3" Grid.Column="2"
-                                                                          PathRestriction="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Expander}, Path=DataContext.DriveLetter}"
-                                                                          SelectedPath="{Binding TargetPath, Mode=TwoWay}"/>
+                                            <controls:FolderBrowseControl Grid.Row="3" Grid.Column="2" ValueChanged="FolderBrowseControl_ValueChanged"
+                                                                          SelectedPath="{Binding TargetPath, Mode=TwoWay, ValidatesOnDataErrors=True}"/>
 
                                             <Button Margin="4" Grid.Row="3" Grid.Column="3"
                                                     ToolTip="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_RunBackup}"

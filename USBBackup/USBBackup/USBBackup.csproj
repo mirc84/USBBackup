@@ -73,7 +73,6 @@
     <Compile Include="Entities\Backup.cs" />
     <Compile Include="Entities\DatabaseModel.cs" />
     <Compile Include="Entities\Drive.cs" />
-    <Compile Include="Entities\Volume.cs" />
     <Compile Include="IBackup.cs" />
     <Compile Include="Loc.cs" />
     <Compile Include="NotificationWrapper.cs" />

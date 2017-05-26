@@ -70,6 +70,42 @@ namespace USBBackup.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to At least one path must reference the device..
+        /// </summary>
+        public static string Backup_Validation_NoPathToDevice {
+            get {
+                return ResourceManager.GetString("Backup_Validation_NoPathToDevice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source directory must be defined..
+        /// </summary>
+        public static string Backup_Validation_SourceNotSet {
+            get {
+                return ResourceManager.GetString("Backup_Validation_SourceNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source and target directory must be different..
+        /// </summary>
+        public static string Backup_Validation_SourceTargetEquals {
+            get {
+                return ResourceManager.GetString("Backup_Validation_SourceTargetEquals", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target directory must be defined..
+        /// </summary>
+        public static string Backup_Validation_TargetNotSet {
+            get {
+                return ResourceManager.GetString("Backup_Validation_TargetNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Source.
         /// </summary>
         public static string BackupSource {

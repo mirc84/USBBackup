@@ -252,4 +252,16 @@
   <data name="UserChoice_HardCancel" xml:space="preserve">
     <value>Do you want to cancel the copy process of the current file?</value>
   </data>
+  <data name="Backup_Validation_TargetNotSet" xml:space="preserve">
+    <value>Target directory must be defined.</value>
+  </data>
+  <data name="Backup_Validation_SourceNotSet" xml:space="preserve">
+    <value>Source directory must be defined.</value>
+  </data>
+  <data name="Backup_Validation_SourceTargetEquals" xml:space="preserve">
+    <value>Source and target directory must be different.</value>
+  </data>
+  <data name="Backup_Validation_NoPathToDevice" xml:space="preserve">
+    <value>At least one path must reference the device.</value>
+  </data>
 </root>

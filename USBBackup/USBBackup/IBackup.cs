@@ -1,6 +1,8 @@
-﻿namespace USBBackup
+﻿using System.ComponentModel;
+
+namespace USBBackup
 {
-    public interface IBackup
+    public interface IBackup : IDataErrorInfo
     {
         bool IsEnabled { get; set; }
         bool IsRunning { get; set; }

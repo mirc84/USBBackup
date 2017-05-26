@@ -8,6 +8,7 @@ using System.IO;
 using NHibernate.Linq;
 using System.Linq;
 using USBBackup.Entities;
+using System;
 
 namespace USBBackup.DatabaseAccess
 {
@@ -47,6 +48,10 @@ namespace USBBackup.DatabaseAccess
                 DeleteIfPersited(drive);
                 return;
             }
+            foreach (var backup in drive.Backups)
+            {
+                backup.IsInverse = (backup.SourcePath.StartsWith(drive.DriveLetter));
+            }
             using (var session = _sessionFactory.OpenSession())
             {
                 foreach (var backup in drive.Backups)
@@ -79,8 +84,16 @@ namespace USBBackup.DatabaseAccess
 
             if (!File.Exists(_dbPath))
                 config = config.ExposeConfiguration(BuildSchema);
+            else
+                config = config.ExposeConfiguration(UpdateSchema);
 
             return config.BuildSessionFactory();
+        }
+
+        private void UpdateSchema(Configuration config)
+        {
+            var schemaUpdate = new SchemaUpdate(config);
+            schemaUpdate.Execute(false, true);
         }
 
         private void BuildSchema(Configuration config)
