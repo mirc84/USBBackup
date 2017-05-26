@@ -97,6 +97,7 @@ namespace USBBackup
                             if (!targetFileInfo.Directory.Exists)
                                 targetFileInfo.Directory.Create();
 
+                            var isCopyFileCompleted = false;
                             using (var fileStream = new FileStream(fileInfo.FullName, FileMode.Open))
                             {
                                 backup.CurrentFileBytes = fileStream.Length;
@@ -133,16 +134,23 @@ namespace USBBackup
                                         pauseEvent.WaitOne();
                                     }
                                 }
+                                isCopyFileCompleted = fileStream.Position == fileStream.Length;
                                 backup.FinishedBytes += fileStream.Length;
                             }
 
-                            if (File.Exists(targetFileInfo.FullName))
-                                File.Delete(targetFileInfo.FullName);
+                            if (isCopyFileCompleted)
+                            {
+                                if (File.Exists(targetFileInfo.FullName))
+                                    File.Delete(targetFileInfo.FullName);
 
-                            File.Move(bakPath, targetFileInfo.FullName);
-                            targetFileInfo.CreationTime = fileInfo.CreationTime;
-                            targetFileInfo.LastWriteTime = fileInfo.LastWriteTime;
-
+                                File.Move(bakPath, targetFileInfo.FullName);
+                                targetFileInfo.CreationTime = fileInfo.CreationTime;
+                                targetFileInfo.LastWriteTime = fileInfo.LastWriteTime;
+                            }
+                            else
+                            {
+                                File.Delete(bakPath);
+                            }
                             backup.CurrentFileBytes = 0L;
                             backup.CurrentFileWrittenBytes = 0L;
                         }
