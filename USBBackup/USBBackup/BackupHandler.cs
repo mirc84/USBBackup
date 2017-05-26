@@ -446,7 +446,7 @@ namespace USBBackup
                 return;
 
             _backupPauseCancellationTokens.TryGetValue(backup, out CancellationTokenSource pauseCancellationToken);
-            pauseCancellationToken.Cancel();
+            pauseCancellationToken?.Cancel();
         }
 
         public void CancelBackups(bool hardCancel)

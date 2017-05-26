@@ -139,6 +139,7 @@ namespace USBBackupGUI
                 return;
 
             var backup = new Backup();
+            backup.Drive = drive.Drive;
             backup.TargetPath = drive.DriveLetter;
             drive.Backups.Add(backup);
         }

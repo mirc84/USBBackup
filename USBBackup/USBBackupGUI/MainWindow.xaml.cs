@@ -9,6 +9,7 @@ using System;
 using System.Windows.Data;
 using System.Globalization;
 using USBBackup;
+using System.Linq;
 
 namespace USBBackupGUI
 {
@@ -83,6 +84,22 @@ namespace USBBackupGUI
                 USBBackup.Properties.Settings.Default.NotifyCleanupStarted = win.NotifyCleanupStarted;
                 USBBackup.Properties.Settings.Default.Language = Loc.CurrentCulture.Name;
                 USBBackup.Properties.Settings.Default.Save();
+            }
+        }
+
+        private void FolderBrowseControl_ValueChanged(object source, RoutedEventArgs e)
+        {
+            var ctrl = source as FolderBrowseControl;
+            if (ctrl == null)
+                return;
+
+            var container = ctrl.Parent as Panel;
+            if (container == null)
+                return;
+
+            foreach (var element in container.Children.OfType<FolderBrowseControl>())
+            {
+                element.GetBindingExpression(FolderBrowseControl.SelectedPathProperty)?.UpdateSource();
             }
         }
     }
