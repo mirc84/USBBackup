@@ -12,11 +12,11 @@ namespace USBBackup.Entities
         private bool _isPaused;
         private string _currentFile;
 
-        private long _bytesToWrite;
-        private long _writtenBytes;
-        private long _finishedBytes;
-        private long _currentFileBytes;
-        private long _currentFileWrittenBytes;
+        private Size _bytesToWrite;
+        private Size _writtenBytes;
+        private Size _finishedBytes;
+        private Size _currentFileBytes;
+        private Size _currentFileWrittenBytes;
 
         public virtual Drive Drive { get; set; }
 
@@ -86,7 +86,7 @@ namespace USBBackup.Entities
             }
         }
 
-        public virtual long BytesToWrite
+        public virtual Size BytesToWrite
         {
             get { return _bytesToWrite; }
             set
@@ -96,7 +96,7 @@ namespace USBBackup.Entities
             }
         }
 
-        public virtual long WrittenBytes
+        public virtual Size WrittenBytes
         {
             get { return _writtenBytes; }
             set
@@ -107,7 +107,7 @@ namespace USBBackup.Entities
         }
 
 
-        public virtual long FinishedBytes
+        public virtual Size FinishedBytes
         {
             get { return _finishedBytes; }
             set
@@ -117,7 +117,7 @@ namespace USBBackup.Entities
             }
         }
 
-        public virtual long CurrentFileBytes
+        public virtual Size CurrentFileBytes
         {
             get { return _currentFileBytes; }
             set
@@ -127,7 +127,7 @@ namespace USBBackup.Entities
             }
         }
 
-        public virtual long CurrentFileWrittenBytes
+        public virtual Size CurrentFileWrittenBytes
         {
             get { return _currentFileWrittenBytes; }
             set

@@ -1,0 +1,159 @@
+﻿<UserControl x:Class="USBBackupGUI.Controls.BackupControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:USBBackupGUI.Controls"
+             xmlns:lex="http://wpflocalizeextension.codeplex.com"
+             xmlns:local1="clr-namespace:USBBackupGUI"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/USBBackupGUI;component/Themes/Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <local1:NotNullToVisibilityConverter x:Key="_notNullToVisibilityConverter" />
+            <local:AreNotEqualToVisibilityConverter x:Key="areNotEqualToVisibilityConverter" />
+
+            <Style TargetType="{x:Type Image}">
+                <Setter Property="Height" Value="32"></Setter>
+                <Setter Property="Width" Value="32"></Setter>
+            </Style>
+
+            <Style x:Key="_quadraticButtonStyle" TargetType="{x:Type Button}">
+                <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource Self}, Path=ActualHeight}"></Setter>
+            </Style>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Label Margin="4,4,4,0" Grid.Row="0" Grid.ColumnSpan="6"
+               Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup.CurrentFile, Converter={StaticResource _notNullToVisibilityConverter}}"
+               Content="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup.CurrentFile}" />
+        <ProgressBar x:Name="_fileProgressBar" Margin="4,0,4,1" Grid.Row="1" Grid.ColumnSpan="6"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                     Minimum="0" Maximum="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup.CurrentFileBytes.Value}" 
+                     Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup.CurrentFileWrittenBytes.Value}" >
+            <ProgressBar.Visibility>
+                <MultiBinding Converter="{StaticResource areNotEqualToVisibilityConverter}">
+                    <Binding RelativeSource="{RelativeSource Self}" Path="Value" />
+                    <Binding RelativeSource="{RelativeSource Self}" Path="Maximum" />
+                </MultiBinding>
+            </ProgressBar.Visibility>
+        </ProgressBar>
+        <TextBlock Margin="4,0,4,1" Grid.Row="1" Grid.ColumnSpan="6"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Visibility="{Binding ElementName=_fileProgressBar, Path=Visibility}">
+            <TextBlock.Text>
+                <MultiBinding StringFormat="{}{0} / {1}">
+                    <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=local:BackupControl}" Path="Backup.CurrentFileWrittenBytes" />
+                    <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=local:BackupControl}" Path="Backup.CurrentFileBytes" />
+                </MultiBinding>
+            </TextBlock.Text>
+        </TextBlock>
+        <ProgressBar x:Name="_fullProgressBar" Margin="4,0,4,4" Grid.Row="2" Grid.ColumnSpan="6"
+                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                     Minimum="0" Maximum="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup.BytesToWrite.Value}" 
+                     Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup.WrittenBytes.Value}">
+            <ProgressBar.Visibility>
+                <MultiBinding Converter="{StaticResource areNotEqualToVisibilityConverter}">
+                    <Binding RelativeSource="{RelativeSource Self}" Path="Value" />
+                    <Binding RelativeSource="{RelativeSource Self}" Path="Maximum" />
+                </MultiBinding>
+            </ProgressBar.Visibility>
+        </ProgressBar>
+        <TextBlock Margin="4,0,4,4" Grid.Row="2" Grid.ColumnSpan="6"
+                    HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Visibility="{Binding ElementName=_fullProgressBar, Path=Visibility}">
+            <TextBlock.Text>
+                <MultiBinding StringFormat="{}{0} / {1}">
+                    <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=local:BackupControl}" Path="Backup.WrittenBytes" />
+                    <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=local:BackupControl}" Path="Backup.BytesToWrite" />
+                </MultiBinding>
+            </TextBlock.Text>
+        </TextBlock>
+
+        <CheckBox Margin="4" Grid.Row="3" Grid.Column="0"
+                  VerticalAlignment="Center"
+                  IsChecked="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup.IsEnabled, Mode=TwoWay}"/>
+
+        <Label Grid.Row="3" Grid.Column="1" Content="{lex:Loc USBBackup:StringResource:BackupSource}"></Label>
+        <local:FolderBrowseControl Grid.Row="3" Grid.Column="1" ValueChanged="FolderBrowseControl_ValueChanged"
+                                   SelectedPath="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup.SourcePath, Mode=TwoWay, ValidatesOnDataErrors=True}" />
+        <Label Grid.Row="3" Grid.Column="2" Content="{lex:Loc USBBackup:StringResource:BackupTarget}"></Label>
+        <local:FolderBrowseControl Grid.Row="3" Grid.Column="2" ValueChanged="FolderBrowseControl_ValueChanged"
+                                   SelectedPath="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup.TargetPath, Mode=TwoWay, ValidatesOnDataErrors=True}"/>
+
+        <Button Margin="4" Grid.Row="3" Grid.Column="3"
+                ToolTip="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_RunBackup}"
+                Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=RunPauseResumeBackupCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup}">
+            <Button.Style>
+                <Style TargetType="Button" BasedOn="{StaticResource _quadraticButtonStyle}">
+                    <Setter Property="Visibility" Value="Visible"/>
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup.IsRunning}" Value="True" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup.IsPaused}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+            <Image Source="/Resources/Images/play-icon.png" />
+        </Button>
+        <Button Margin="4" Grid.Row="3" Grid.Column="3"                                                    
+                ToolTip="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_PauseBackup}"
+                Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=RunPauseResumeBackupCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup}">
+            <Button.Style>
+                <Style TargetType="Button" BasedOn="{StaticResource _quadraticButtonStyle}">
+                    <Setter Property="Visibility" Value="Collapsed"/>
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup.IsRunning}" Value="True" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup.IsPaused}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Visible"/>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+            <Image Source="/Resources/Images/pause-icon.png" />
+        </Button>
+        <Button Margin="4" Grid.Row="3" Grid.Column="4"
+                ToolTip="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_CancelBackup}"
+                IsEnabled="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup.IsRunning}" 
+                Style="{StaticResource _quadraticButtonStyle}"
+                Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=CancelBackupCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup}">
+            <Image Source="/Resources/Images/stop-icon.png" />
+        </Button>
+        <Button Margin="4" Grid.Row="3" Grid.Column="5"
+                ToolTip="{lex:Loc USBBackup:StringResource:MainWindow_Tooltip_DeleteBackup}"
+                Style="{StaticResource _quadraticButtonStyle}"
+                Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=RemoveBackupCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup}">
+            <Image Source="/Resources/Images/delete-icon.png" />
+        </Button>
+    </Grid>
+</UserControl>
