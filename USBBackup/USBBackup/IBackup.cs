@@ -11,10 +11,10 @@ namespace USBBackup
         string TargetPath { get; set; }
 
         string CurrentFile { get; set; }
-        long BytesToWrite { get; set; }
-        long WrittenBytes { get; set; }
-        long FinishedBytes { get; set; }
-        long CurrentFileBytes { get; set; }
-        long CurrentFileWrittenBytes { get; set; }
+        Size BytesToWrite { get; set; }
+        Size WrittenBytes { get; set; }
+        Size FinishedBytes { get; set; }
+        Size CurrentFileBytes { get; set; }
+        Size CurrentFileWrittenBytes { get; set; }
     }
 }
