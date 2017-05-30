@@ -70,6 +70,15 @@ namespace USBBackup.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Analyzing....
+        /// </summary>
+        public static string Backup_Analyzing {
+            get {
+                return ResourceManager.GetString("Backup_Analyzing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to At least one path must reference the device..
         /// </summary>
         public static string Backup_Validation_NoPathToDevice {

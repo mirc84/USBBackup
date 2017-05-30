@@ -10,6 +10,7 @@ using System.Windows.Data;
 using System.Globalization;
 using USBBackup;
 using System.Linq;
+using USBBackup.Strings;
 
 namespace USBBackupGUI
 {
@@ -30,7 +31,8 @@ namespace USBBackupGUI
 
         private void OnClosing(object sender, CancelEventArgs args)
         {
-            var choice = MessageBox.Show(new Loc("MainWindow_ClosingSaveQuestion"), new Loc("MainWindow_ClosingSaveQuestion_Caption"), MessageBoxButton.YesNoCancel);
+            var choice = MessageBox.Show(new Loc(nameof(StringResource.MainWindow_ClosingSaveQuestion)), 
+                new Loc(nameof(StringResource.MainWindow_ClosingSaveQuestion_Caption)), MessageBoxButton.YesNoCancel);
             if (choice == MessageBoxResult.Yes)
                 _viewModel.SaveCommand.Execute(null);
 

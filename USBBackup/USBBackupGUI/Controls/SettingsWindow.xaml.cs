@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using USBBackup;
+using USBBackup.Strings;
 using WPFLocalizeExtension.Engine;
 
 namespace USBBackupGUI.Controls
@@ -118,7 +119,8 @@ namespace USBBackupGUI.Controls
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            var choice = MessageBox.Show(new Loc("SettingsWindow_CancelQuestion"), new Loc("SettingsWindow_CancelQuestion_Caption"), MessageBoxButton.OKCancel);
+            var choice = MessageBox.Show(new Loc(nameof(StringResource.SettingsWindow_CancelQuestion)), 
+                new Loc(nameof(StringResource.SettingsWindow_CancelQuestion_Caption)), MessageBoxButton.OKCancel);
             if (choice != MessageBoxResult.OK)
                 return;
 

@@ -264,4 +264,7 @@
   <data name="Backup_Validation_NoPathToDevice" xml:space="preserve">
     <value>At least one path must reference the device.</value>
   </data>
+  <data name="Backup_Analyzing" xml:space="preserve">
+    <value>Analyzing...</value>
+  </data>
 </root>

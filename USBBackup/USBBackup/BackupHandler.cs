@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using USBBackup.Entities;
+using USBBackup.Strings;
 
 namespace USBBackup
 {
@@ -64,13 +65,14 @@ namespace USBBackup
             {
                 try
                 {
+                    Log.Backup.Info($"Starting backup from '{backup.SourcePath}' to '{backup.TargetPath}'");
                     backup.IsRunning = true;
                     OnBackupStarted(backup);
                     var dir = new DirectoryInfo(backup.SourcePath);
                     if (!dir.Exists)
                         return;
 
-                    backup.CurrentFile = "Analysing";
+                    backup.CurrentFile = new Loc(nameof(StringResource.Backup_Analyzing));
 
                     var files = GetUpdatedBackupFiles(backup);
                     backup.BytesToWrite = files.Keys.Sum(x => x.Length);
@@ -159,14 +161,16 @@ namespace USBBackup
                         }
                         catch (Exception e)
                         {
-                            Debugger.Break();
+                            Log.Backup.Error(e, $"An error occurred during backing up '{backupFilePair.Key.FullName}'.");
                         }
                     }
+
+                    Log.Backup.Info($"Finished backup from '{backup.SourcePath}' to '{backup.TargetPath}'");
                     _backupPauseCancellationTokens.Remove(backup);
                 }
                 catch (Exception e)
                 {
-
+                    Log.Backup.Error(e, $"An error occurred during backup from '{backup.SourcePath}' to '{backup.TargetPath}'.");
                 }
                 finally
                 {
@@ -254,7 +258,7 @@ namespace USBBackup
                     {
                         if (fileInfo.FullName.StartsWith(recycleBin))
                             continue;
-                        //if (backup.IsPaused)
+
                         {
                             pauseEvent.WaitOne();
                         }
@@ -289,15 +293,15 @@ namespace USBBackup
 
                             File.Move(fileInfo.FullName, recycleFileInfo.FullName);
                         }
-                        catch (Exception)
+                        catch (Exception e)
                         {
-
+                            Log.Backup.Error(e, $"An error occurred while recylcing '{fileInfo.FullName}'.");
                         }
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-
+                    Log.Backup.Error(e, $"An error occurred during cleanup of '{backup.TargetPath}'.");
                 }
                 finally
                 {
@@ -317,13 +321,11 @@ namespace USBBackup
             if (backup.Error != null)
                 return;
 
-            Task runningTask;
-            _tasks.TryGetValue(backup, out runningTask);
+            _tasks.TryGetValue(backup, out Task runningTask);
             if (runningTask == null)
                 runningTask = Task.Factory.StartNew(() => { });
 
-            CancellationTokenSource token;
-            if (!_backupCancellationTokens.TryGetValue(backup, out token))
+            if (!_backupCancellationTokens.TryGetValue(backup, out CancellationTokenSource token))
             {
                 token = new CancellationTokenSource();
                 _backupCancellationTokens.Add(backup, token);
@@ -343,38 +345,31 @@ namespace USBBackup
                     if (!targetDir.Exists)
                         targetDir.Create();
 
-                    try
-                    {
-                        var relativePath = changedPath.Substring(backup.SourcePath.Length);
-                        backup.CurrentFile = ".." + relativePath;
-                        var targetFileInfo = new FileInfo(string.Concat(backup.TargetPath, relativePath));
+                    var relativePath = changedPath.Substring(backup.SourcePath.Length);
+                    backup.CurrentFile = ".." + relativePath;
+                    var targetFileInfo = new FileInfo(string.Concat(backup.TargetPath, relativePath));
 
-                        if (targetFileInfo.Exists && fileInfo.LastWriteTime == targetFileInfo.LastWriteTime)
-                            return;
+                    if (targetFileInfo.Exists && fileInfo.LastWriteTime == targetFileInfo.LastWriteTime)
+                        return;
 
-                        if (!targetFileInfo.Directory.Exists)
-                            targetFileInfo.Directory.Create();
+                    if (!targetFileInfo.Directory.Exists)
+                        targetFileInfo.Directory.Create();
 
-                        var targetPath = targetFileInfo.FullName;
-                        var bakPath = targetPath + ".bak";
-                        if (File.Exists(bakPath))
-                            File.Delete(bakPath);
+                    var targetPath = targetFileInfo.FullName;
+                    var bakPath = targetPath + ".bak";
+                    if (File.Exists(bakPath))
+                        File.Delete(bakPath);
 
-                        File.Copy(fileInfo.FullName, bakPath);
+                    File.Copy(fileInfo.FullName, bakPath);
 
-                        if (File.Exists(targetPath))
-                            File.Delete(targetPath);
+                    if (File.Exists(targetPath))
+                        File.Delete(targetPath);
 
-                        File.Move(targetPath + ".bak", targetPath);
-                    }
-                    catch (Exception e)
-                    {
-                        Debugger.Break();
-                    }
+                    File.Move(targetPath + ".bak", targetPath);
                 }
                 catch (Exception e)
                 {
-
+                    Log.Backup.Error(e, $"An error occurred while applying change of '{changedPath}' to '{backup.TargetPath}'.");
                 }
                 finally
                 {
@@ -406,6 +401,8 @@ namespace USBBackup
 
         public void PauseBackups()
         {
+            Log.Backup.Info("Pausing all backups");
+
             foreach (var pauseEvent in _backupResetEvents)
             {
                 pauseEvent.Key.IsPaused = true;
@@ -416,6 +413,7 @@ namespace USBBackup
 
         public void PauseBackup(IBackup backup)
         {
+            Log.Backup.Info($"Pausing backup from '{backup.SourcePath}' to '{backup.TargetPath}'");
             _backupResetEvents.TryGetValue(backup, out ManualResetEvent pauseEvent);
             pauseEvent?.Reset();
             _backupPauseCancellationTokens.TryGetValue(backup, out CancellationTokenSource pauseCancellationToken);
@@ -426,6 +424,7 @@ namespace USBBackup
 
         public void ResumeBackups()
         {
+            Log.Backup.Info("Resuming all backups");
             foreach (var pauseEvent in _backupResetEvents)
             {
                 pauseEvent.Key.IsPaused = false;
@@ -436,6 +435,7 @@ namespace USBBackup
 
         public void ResumeBackup(IBackup backup)
         {
+            Log.Backup.Info($"Resuming backup from '{backup.SourcePath}' to '{backup.TargetPath}'");
             backup.IsPaused = false;
             _backupResetEvents.TryGetValue(backup, out ManualResetEvent pauseEvent);
             pauseEvent?.Set();
@@ -444,6 +444,7 @@ namespace USBBackup
 
         public void CancelBackup(IBackup backup, bool hardCancel)
         {
+            Log.Backup.Info($"Cancelling backup from '{backup.SourcePath}' to '{backup.TargetPath}'");
             _backupCancellationTokens.TryGetValue(backup, out CancellationTokenSource cancellationToken);
             cancellationToken?.Cancel();
             _backupResetEvents.TryGetValue(backup, out ManualResetEvent pauseEvent);
@@ -457,6 +458,7 @@ namespace USBBackup
 
         public void CancelBackups(bool hardCancel)
         {
+            Log.Backup.Info("Cancelling all backups");
             foreach (var token in _backupCancellationTokens.Values)
                 token.Cancel();
 
