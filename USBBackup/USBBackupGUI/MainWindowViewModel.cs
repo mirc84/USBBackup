@@ -4,9 +4,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using USBBackup;
 using USBBackup.Core;
 using USBBackup.Entities;
+using USBBackup.Strings;
 
 namespace USBBackupGUI
 {
@@ -18,9 +20,11 @@ namespace USBBackupGUI
         private readonly UsbDeviceRepository _usbDeviceRepository;
         private IList<DriveNotificationWrapper> _usbDevices;
         private BackupHandler _backupHandler;
+        private Dispatcher _dispatcher;
 
-        public MainWindowViewModel(UsbDeviceRepository usbDeviceRepository, BackupHandler backupHandler)
+        public MainWindowViewModel(UsbDeviceRepository usbDeviceRepository, BackupHandler backupHandler, Dispatcher dispatcher)
         {
+            _dispatcher = dispatcher;
             _backupHandler = backupHandler;
             _usbDeviceRepository = usbDeviceRepository;
             _usbDeviceRepository.USBDevicesChanged += OnUSBDevicesChanged;
@@ -66,7 +70,8 @@ namespace USBBackupGUI
             if (backup == null)
                 return;
 
-            var choice = OnUserChoiceRequested(new Loc("UserChoice_HardCancel"), new Loc("UserChoice_HardCancel_Caption"), MessageBoxButton.YesNoCancel);
+            var choice = OnUserChoiceRequested(new Loc(nameof(StringResource.UserChoice_HardCancel)), 
+                new Loc(nameof(StringResource.UserChoice_HardCancel_Caption)), MessageBoxButton.YesNoCancel);
             if (choice == MessageBoxResult.Cancel)
                 return;
 
@@ -83,7 +88,8 @@ namespace USBBackupGUI
             if (drive == null)
                 return;
 
-            var choice = OnUserChoiceRequested(new Loc("UserChoice_RemoveBackup"), new Loc("UserChoiceCaption_RemoveBackup"));
+            var choice = OnUserChoiceRequested(new Loc(nameof(StringResource.UserChoice_RemoveBackup)), 
+                new Loc(nameof(StringResource.UserChoiceCaption_RemoveBackup)));
             if (choice != MessageBoxResult.Yes)
                 return;
 
@@ -93,8 +99,16 @@ namespace USBBackupGUI
 
         private void Save(object obj)
         {
-            _usbDeviceRepository.Save();
-            OnUserNotification(new Loc("UserNotification_BackupsSaved"), new Loc("UserNotificationCaption_BackupsSaved"));
+            try
+            {
+                _usbDeviceRepository.Save();
+                OnUserNotification(new Loc(nameof(StringResource.UserNotification_BackupsSaved)),
+                    new Loc(nameof(StringResource.UserNotificationCaption_BackupsSaved)));
+            }
+            catch (Exception e)
+            {
+                Log.Application.Error(e, "An error occurred while saving backups");
+            }
         }
 
         private void RunAllBackups(object obj)
@@ -127,7 +141,7 @@ namespace USBBackupGUI
         {
             var existing = UsbDevices.FirstOrDefault(x => x.Drive.DeviceID == drive.DeviceID && x.Drive.PNPDeviceID == drive.PNPDeviceID);
             if (existing == null)
-                UsbDevices.Add(new DriveNotificationWrapper(drive));
+                _dispatcher.BeginInvoke(new Action(() => UsbDevices.Add(new DriveNotificationWrapper(drive))));
             else
                 existing.IsAttached = drive.IsAttached;
         }
@@ -138,9 +152,11 @@ namespace USBBackupGUI
             if (drive == null)
                 return;
 
-            var backup = new Backup();
-            backup.Drive = drive.Drive;
-            backup.TargetPath = drive.DriveLetter;
+            var backup = new Backup()
+            {
+                Drive = drive.Drive,
+                TargetPath = drive.DriveLetter
+            };
             drive.Backups.Add(backup);
         }
 

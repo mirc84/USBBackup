@@ -19,21 +19,21 @@ namespace USBBackup
         private readonly USBWatcher _watcher;
         private readonly DatabaseConnection _databaseConncetion;
         private readonly BackupHandler _backupHandler;
-        private readonly Dispatcher _dispatcher;
         private Timer _backupTimer;
         private IDictionary<Backup, FileSystemWatcher> _backupFileWatchers;
 
-        public UsbDeviceRepository(USBWatcher watcher, DatabaseConnection databaseConncetion, BackupHandler backupHandler, Dispatcher dispatcher)
+        public UsbDeviceRepository(USBWatcher watcher, DatabaseConnection databaseConncetion, BackupHandler backupHandler)
         {
             _watcher = watcher;
             _databaseConncetion = databaseConncetion;
             _backupHandler = backupHandler;
-            _dispatcher = dispatcher;
             _backupFileWatchers = new Dictionary<Backup, FileSystemWatcher>();
-            USBDevices = new ObservableCollection<Drive>();
-            _backupTimer = new Timer();
-            _backupTimer.AutoReset = true;
-            _backupTimer.Interval = USBBackup.Properties.Settings.Default.BackupInterval.TotalMilliseconds;
+            USBDevices = new List<Drive>();
+            _backupTimer = new Timer()
+            {
+                AutoReset = true,
+                Interval = Properties.Settings.Default.BackupInterval.TotalMilliseconds
+            };
             _backupTimer.Elapsed += (_, __) => RunAllBackups();
             Properties.Settings.Default.PropertyChanged += OnSettingsChanged;
         }
@@ -74,9 +74,11 @@ namespace USBBackup
                 USBDevices.Add(usbDeviceInfo);
                 foreach (var backup in usbDeviceInfo.Backups.Where(x=> x.SourcePath != null && Directory.Exists(x.SourcePath)))
                 {
-                    var watcher = new FileSystemWatcher(backup.SourcePath);
-                    watcher.EnableRaisingEvents = true;
-                    watcher.IncludeSubdirectories = true;
+                    var watcher = new FileSystemWatcher(backup.SourcePath)
+                    {
+                        EnableRaisingEvents = true,
+                        IncludeSubdirectories = true
+                    };
                     watcher.Changed += (s, f) => OnDirChanged(backup, f);
                     watcher.Created += (s, f) => OnDirChanged(backup, f);
                     watcher.Deleted += (s, f) => OnDirDeleted(backup, f);
@@ -112,7 +114,7 @@ namespace USBBackup
             var existingDevice = USBDevices.FirstOrDefault(x => x.DeviceID == drive.DeviceID && x.PNPDeviceID == drive.PNPDeviceID);
             if (existingDevice == null)
             {
-                _dispatcher.Invoke(() => USBDevices.Add(drive));
+                USBDevices.Add(drive);
                 OnUSBDevicesChanged(drive);
 
                 return;
@@ -142,7 +144,7 @@ namespace USBBackup
 
             existingDevice.IsAttached = false;
             if (existingDevice.Backups == null || !existingDevice.Backups.Any())
-                _dispatcher.Invoke(() => USBDevices.Remove(existingDevice));
+                USBDevices.Remove(existingDevice);
 
             OnUSBDevicesChanged(existingDevice);
         }

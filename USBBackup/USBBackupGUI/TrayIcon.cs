@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Forms;
 using USBBackup;
+using USBBackup.Strings;
 using USBBackupGUI.Resources;
 
 namespace USBBackupGUI
@@ -58,32 +59,32 @@ namespace USBBackupGUI
         {
             var runItem = new MenuItem()
             {
-                Text = new Loc("TrayIcon_RunBackups"),
+                Text = new Loc(nameof(StringResource.TrayIcon_RunBackups)),
             };
             runItem.Click += OnRunBackupRequested;
 
             _pauseItem = new MenuItem()
             {
-                Text = new Loc("TrayIcon_PauseBackups"),
+                Text = new Loc(nameof(StringResource.TrayIcon_PauseBackups)),
             };
             _pauseItem.Click += OnPauseBackupsRequested;
 
             _cancelItem = new MenuItem()
             {
-                Text = new Loc("TrayIcon_CancelBackups")
+                Text = new Loc(nameof(StringResource.TrayIcon_CancelBackups))
             };
             _cancelItem.Click += OnCancelBackupsRequested;
 
             var showWindowItem = new MenuItem()
             {
-                Text = new Loc("TrayIcon_Open"),
+                Text = new Loc(nameof(StringResource.TrayIcon_Open)),
                 DefaultItem = true
             };
             showWindowItem.Click += (_, __) => ShowWindow();
 
             var closeItem = new MenuItem()
             {
-                Text = new Loc("TrayIcon_Close")
+                Text = new Loc(nameof(StringResource.TrayIcon_Close))
             };
             closeItem.Click += (_, __) => _window.Close();
 
@@ -106,12 +107,12 @@ namespace USBBackupGUI
                     break;
                 case BackupState.Running:
                     _pauseItem.Enabled = true;
-                    _pauseItem.Text = new Loc("TrayIcon_PauseBackups");
+                    _pauseItem.Text = new Loc(nameof(StringResource.TrayIcon_PauseBackups));
                     _cancelItem.Enabled = true;
                     break;
                 case BackupState.Paused:
                     _pauseItem.Enabled = true;
-                    _pauseItem.Text = new Loc("TrayIcon_ResumeBackups");
+                    _pauseItem.Text = new Loc(nameof(StringResource.TrayIcon_ResumeBackups));
                     _cancelItem.Enabled = true;
                     break;
                 default:
@@ -124,7 +125,8 @@ namespace USBBackupGUI
             if (!USBBackup.Properties.Settings.Default.NotifyCleanupStarted)
                 return;
 
-            _icon.ShowBalloonTip(500, new Loc("TrayIcon_CleanUpStarted_Caption"), new Loc("TrayIcon_CleanUpStarted", backup.TargetPath), ToolTipIcon.Info);
+            _icon.ShowBalloonTip(500, new Loc(nameof(StringResource.TrayIcon_CleanUpStarted_Caption)), 
+                new Loc(nameof(StringResource.TrayIcon_CleanUpStarted), backup.TargetPath), ToolTipIcon.Info);
         }
 
         internal void OnNotifyCleanupFinished(IBackup backup)
@@ -132,7 +134,8 @@ namespace USBBackupGUI
             if (!USBBackup.Properties.Settings.Default.NotifyCleanupFinished)
                 return;
 
-            _icon.ShowBalloonTip(500, new Loc("TrayIcon_CleanUpFinished_Caption"), new Loc("TrayIcon_CleanUpFinished", backup.TargetPath), ToolTipIcon.Info);
+            _icon.ShowBalloonTip(500, new Loc(nameof(StringResource.TrayIcon_CleanUpFinished_Caption)), 
+                new Loc(nameof(StringResource.TrayIcon_CleanUpFinished), backup.TargetPath), ToolTipIcon.Info);
         }
 
         internal void OnNotifyBackupFinished(IBackup backup)
@@ -140,7 +143,8 @@ namespace USBBackupGUI
             if (!USBBackup.Properties.Settings.Default.NotifyBackupFinished)
                 return;
 
-            _icon.ShowBalloonTip(500, new Loc("TrayIcon_BackupFinished_Caption"), new Loc("TrayIcon_BackupFinished", backup.TargetPath), ToolTipIcon.Info);
+            _icon.ShowBalloonTip(500, new Loc(nameof(StringResource.TrayIcon_BackupFinished_Caption)), 
+                new Loc(nameof(StringResource.TrayIcon_BackupFinished), backup.TargetPath), ToolTipIcon.Info);
 
         }
 
@@ -149,7 +153,8 @@ namespace USBBackupGUI
             if (!USBBackup.Properties.Settings.Default.NotifyBackupStarted)
                 return;
 
-            _icon.ShowBalloonTip(500, new Loc("TrayIcon_BackupStarted_Caption"), new Loc("TrayIcon_BackupStarted", backup.TargetPath), ToolTipIcon.Info);
+            _icon.ShowBalloonTip(500, new Loc(nameof(StringResource.TrayIcon_BackupStarted_Caption)), 
+                new Loc(nameof(StringResource.TrayIcon_BackupStarted), backup.TargetPath), ToolTipIcon.Info);
         }
 
         private void OnCancelBackupsRequested(object sender, EventArgs e)

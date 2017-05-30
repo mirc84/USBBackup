@@ -41,7 +41,15 @@ namespace USBBackup.DatabaseAccess
             }
         }
 
-        public void SaveDevice(Drive drive)
+        public void SaveDevices(IList<Drive> usbDevices)
+        {
+            foreach (var device in usbDevices)
+            {
+                Save(device);
+            }
+        }
+
+        public void Save(Drive drive)
         {
             if (!drive.Backups.Any())
             {
@@ -73,6 +81,7 @@ namespace USBBackup.DatabaseAccess
                     session.Delete(backup);
                 }
                 session.Delete(drive);
+                session.Flush();
             }
         }
 
@@ -105,14 +114,6 @@ namespace USBBackup.DatabaseAccess
             // this NHibernate tool takes a configuration (with mapping info in)
             // and exports a database schema from it
             new SchemaExport(config).Create(false, true);
-        }
-
-        public void SaveDevices(IList<Drive> usbDevices)
-        {
-            foreach (var device in usbDevices)
-            {
-                SaveDevice(device);
-            }
         }
     }
 }

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using USBBackup;
 using USBBackup.DatabaseAccess;
+using USBBackup.Strings;
 
 namespace USBBackupGUI
 {
@@ -28,15 +30,24 @@ namespace USBBackupGUI
         [STAThread]
         public static int Main(params string[] args)
         {
-            var app = new App();
-            
-            app.Run();
+            try
+            {
+                var app = new App();
 
-            return 0;
+                app.Run();
+
+                return 0;
+            }
+            catch (Exception e)
+            {
+                Log.Application.Fatal(e, "Fatal error occurred. Application is shutting down.");
+                return 1;
+            }
         }
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            Log.Application.Info($"Starting USBBackup {Assembly.GetExecutingAssembly().FullName}");
             var @event = new EventWaitHandle(false, EventResetMode.ManualReset, "Global_MKayBackupStartup", out bool created);
             if (!created)
             {
@@ -73,9 +84,9 @@ namespace USBBackupGUI
             if (!Directory.Exists(directory))
                 Directory.CreateDirectory(directory);
             _databaseContext = new DatabaseConnection(dbPath);
-            _deviceRepository = new UsbDeviceRepository(_watcher, _databaseContext, _backupHandler, Dispatcher.CurrentDispatcher);
+            _deviceRepository = new UsbDeviceRepository(_watcher, _databaseContext, _backupHandler);
 
-            _viewModel = new MainWindowViewModel(_deviceRepository, _backupHandler);
+            _viewModel = new MainWindowViewModel(_deviceRepository, _backupHandler, Dispatcher);
             _window = new MainWindow()
             {
                 DataContext = _viewModel,
@@ -119,7 +130,8 @@ namespace USBBackupGUI
 
         private void OnCancelBackupsRequested(object sender, EventArgs e)
         {
-            var choice = MessageBox.Show(_window, new Loc("UserChoice_HardCancel"), new Loc("UserChoice_HardCancel_Caption"), MessageBoxButton.YesNoCancel);
+            var choice = MessageBox.Show(_window, new Loc(nameof(StringResource.UserChoice_HardCancel)), 
+                new Loc(nameof(StringResource.UserChoice_HardCancel_Caption)), MessageBoxButton.YesNoCancel);
             if (choice == MessageBoxResult.Cancel)
                 return;
 
@@ -133,6 +145,7 @@ namespace USBBackupGUI
 
         private void Shutdown(object sender, EventArgs eventArgs)
         {
+            Log.Application.Info($"Shutting down USBBackup {Assembly.GetExecutingAssembly().FullName}");
             _backupHandler.CancelBackups(true);
             Shutdown();
         }
