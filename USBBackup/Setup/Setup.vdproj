@@ -291,6 +291,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_8706DDEC6DD9D5DC76778492A9CB3621"
+        "OwnerKey" = "8:_1082DB78C3C54341B6D641C2420B50ED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8706DDEC6DD9D5DC76778492A9CB3621"
+        "OwnerKey" = "8:_B148658492C0407BA51BDA74487F2AF9"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_8AA83880C28A0D41141B382B8953A12E"
         "OwnerKey" = "8:_1082DB78C3C54341B6D641C2420B50ED"
         "MsmSig" = "8:_UNDEFINED"
@@ -323,6 +335,18 @@
         {
         "MsmKey" = "8:_9D25DF83C084EB313DF666E643FC7EBE"
         "OwnerKey" = "8:_1082DB78C3C54341B6D641C2420B50ED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B148658492C0407BA51BDA74487F2AF9"
+        "OwnerKey" = "8:_1082DB78C3C54341B6D641C2420B50ED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_B148658492C0407BA51BDA74487F2AF9"
+        "OwnerKey" = "8:_1AD7524B31A71437C2178FA076397F69"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -472,6 +496,12 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_B148658492C0407BA51BDA74487F2AF9"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_96CC0A18558A316A709B48B290BF8C7E"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -485,6 +515,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_4DDD7F7579C7F5BDCA6C71F0E6C89033"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_8706DDEC6DD9D5DC76778492A9CB3621"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1078,7 +1114,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:USBBackup, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:USBBackup, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_1AD7524B31A71437C2178FA076397F69"
@@ -2128,6 +2164,37 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_8706DDEC6DD9D5DC76778492A9CB3621"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:System.IO.Compression, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089"
+                "ScatterAssemblies"
+                {
+                    "_8706DDEC6DD9D5DC76778492A9CB3621"
+                    {
+                    "Name" = "8:System.IO.Compression.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:System.IO.Compression.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_10F2D5F6553E489298196B2B885120E6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_8AA83880C28A0D41141B382B8953A12E"
             {
             "AssemblyRegister" = "3:1"
@@ -2311,6 +2378,37 @@
             "PackageAs" = "3:1"
             "Register" = "3:1"
             "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_B148658492C0407BA51BDA74487F2AF9"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:FALSE"
+            "AssemblyAsmDisplayName" = "8:NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL"
+                "ScatterAssemblies"
+                {
+                    "_B148658492C0407BA51BDA74487F2AF9"
+                    {
+                    "Name" = "8:NLog.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:NLog.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_10F2D5F6553E489298196B2B885120E6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
@@ -2846,19 +2944,19 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:USB Backup"
-        "ProductCode" = "8:{644CD541-6BE9-49D8-8C96-D51B09A87EB4}"
-        "PackageCode" = "8:{2D36DDDC-936A-4538-912E-DA62B7D6DD9D}"
+        "ProductCode" = "8:{7C1CA5B2-1BE8-4A4C-B3C1-AE09BD1E7B34}"
+        "PackageCode" = "8:{570FF924-6B23-4E17-A369-F754E52EDA07}"
         "UpgradeCode" = "8:{1F0E5D30-B85C-4E4A-8D7E-97199FD05051}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.1"
+        "ProductVersion" = "8:1.0.2"
         "Manufacturer" = "8:MKay"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:USB BAckup"
+        "Title" = "8:USB Backup"
         "Subject" = "8:"
         "ARPCONTACT" = "8:m_irco"
         "Keywords" = "8:"
