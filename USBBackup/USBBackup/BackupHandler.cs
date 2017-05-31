@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -11,15 +10,22 @@ using USBBackup.Strings;
 namespace USBBackup
 {
     public delegate void BackupHandledEventHandler(IBackup backup);
+
     public delegate void BackupStateChangedEventHandler(BackupState state);
 
     public class BackupHandler
     {
-        private Dictionary<IBackup, Task> _tasks;
-        private Dictionary<IBackup, CancellationTokenSource> _backupCancellationTokens;
-        private Dictionary<IBackup, CancellationTokenSource> _backupPauseCancellationTokens;
+        #region Fields
+
+        private readonly Dictionary<IBackup, Task> _tasks;
+        private readonly Dictionary<IBackup, CancellationTokenSource> _backupCancellationTokens;
+        private readonly Dictionary<IBackup, CancellationTokenSource> _backupPauseCancellationTokens;
         private volatile Dictionary<IBackup, ManualResetEvent> _backupResetEvents;
         private BackupState _state;
+
+        #endregion
+
+        #region Constructor
 
         public BackupHandler()
         {
@@ -29,20 +35,20 @@ namespace USBBackup
             _backupPauseCancellationTokens = new Dictionary<IBackup, CancellationTokenSource>();
         }
 
+        #endregion
+
+        #region Events
+
         public event BackupHandledEventHandler BackupStarted;
         public event BackupHandledEventHandler BackupFinished;
         public event BackupHandledEventHandler CleanupStarted;
         public event BackupHandledEventHandler CleanupFinished;
         public event BackupStateChangedEventHandler StateChanged;
 
-        public void HandleBackup(DriveNotificationWrapper existingDevice)
-        {
-            foreach (var backup in existingDevice.Backups)
-            {
-                HandleBackup(backup);
-            }
-        }
+        #endregion
 
+        #region Public Methods
+        
         public void HandleBackup(Drive drive)
         {
             foreach (var backup in drive.Backups)
@@ -50,7 +56,7 @@ namespace USBBackup
                 HandleBackup(backup);
             }
         }
-        
+
         public void HandleBackup(IBackup backup, bool force = false)
         {
             if (backup.Error != null)
@@ -108,7 +114,8 @@ namespace USBBackup
                                 backup.CurrentFileBytes = fileStream.Length;
                                 using (var targetFileStream = new FileStream(bakPath, FileMode.Create))
                                 {
-                                    while (!token.Token.IsCancellationRequested && fileStream.Position < fileStream.Length)
+                                    while (!token.Token.IsCancellationRequested &&
+                                           fileStream.Position < fileStream.Length)
                                     {
                                         try
                                         {
@@ -161,7 +168,8 @@ namespace USBBackup
                         }
                         catch (Exception e)
                         {
-                            Log.Backup.Error(e, $"An error occurred during backing up '{backupFilePair.Key.FullName}'.");
+                            Log.Backup.Error(e,
+                                $"An error occurred during backing up '{backupFilePair.Key.FullName}'.");
                         }
                     }
 
@@ -170,7 +178,8 @@ namespace USBBackup
                 }
                 catch (Exception e)
                 {
-                    Log.Backup.Error(e, $"An error occurred during backup from '{backup.SourcePath}' to '{backup.TargetPath}'.");
+                    Log.Backup.Error(e,
+                        $"An error occurred during backup from '{backup.SourcePath}' to '{backup.TargetPath}'.");
                 }
                 finally
                 {
@@ -191,59 +200,13 @@ namespace USBBackup
                 RecycleBackupFiles(backup);
         }
 
-        private IDictionary<FileInfo, FileInfo> GetUpdatedBackupFiles(IBackup backup)
-        {
-            var updatedFiles = new Dictionary<FileInfo, FileInfo>();
-
-            var dir = new DirectoryInfo(backup.SourcePath);
-            if (!dir.Exists)
-                return updatedFiles;
-
-            var targetDir = new DirectoryInfo(backup.SourcePath);
-            if (!targetDir.Exists)
-                targetDir.Create();
-
-            foreach (var fileInfo in dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
-            {
-                var relativePath = fileInfo.FullName.Substring(backup.SourcePath.Length);
-                var targetFileInfo = new FileInfo(string.Concat(backup.TargetPath, relativePath));
-
-                if (targetFileInfo.Exists && fileInfo.LastWriteTime == targetFileInfo.LastWriteTime)
-                    continue;
-
-                updatedFiles.Add(fileInfo, targetFileInfo);
-            }
-            return updatedFiles;
-        }
-
-        private void PrepareBackup(IBackup backup, out CancellationTokenSource token, out ManualResetEvent pauseEvent, out Task task)
-        {
-            if (!_backupCancellationTokens.TryGetValue(backup, out token) || token.Token.IsCancellationRequested)
-            {
-                token = new CancellationTokenSource();
-                _backupCancellationTokens[backup] = token;
-            }
-
-            if (!_backupResetEvents.TryGetValue(backup, out pauseEvent))
-            {
-                pauseEvent = new ManualResetEvent(false);
-                _backupResetEvents[backup] = pauseEvent;
-            }
-            pauseEvent.Set();
-
-            if (!_tasks.TryGetValue(backup, out task))
-            {
-                task = Task.Factory.StartNew(() => { backup.IsRunning = false; });
-            }
-        }
-
         public void RecycleBackupFiles(IBackup backup)
         {
             if (!backup.IsEnabled || backup.Error != null)
                 return;
 
             PrepareBackup(backup, out CancellationTokenSource token, out ManualResetEvent pauseEvent, out Task task);
-            
+
             task = task.ContinueWith(t =>
             {
                 var directory = new DirectoryInfo(backup.TargetPath);
@@ -311,7 +274,7 @@ namespace USBBackup
                     OnCleanupFinished(backup);
                 }
             }
-            , token.Token);
+                , token.Token);
 
             _tasks[backup] = task;
         }
@@ -369,7 +332,8 @@ namespace USBBackup
                 }
                 catch (Exception e)
                 {
-                    Log.Backup.Error(e, $"An error occurred while applying change of '{changedPath}' to '{backup.TargetPath}'.");
+                    Log.Backup.Error(e,
+                        $"An error occurred while applying change of '{changedPath}' to '{backup.TargetPath}'.");
                 }
                 finally
                 {
@@ -478,6 +442,57 @@ namespace USBBackup
             OnStateChanged();
         }
 
+        #endregion
+
+        #region Non Public Methods
+
+        private IDictionary<FileInfo, FileInfo> GetUpdatedBackupFiles(IBackup backup)
+        {
+            var updatedFiles = new Dictionary<FileInfo, FileInfo>();
+
+            var dir = new DirectoryInfo(backup.SourcePath);
+            if (!dir.Exists)
+                return updatedFiles;
+
+            var targetDir = new DirectoryInfo(backup.SourcePath);
+            if (!targetDir.Exists)
+                targetDir.Create();
+
+            foreach (var fileInfo in dir.EnumerateFiles("*.*", SearchOption.AllDirectories))
+            {
+                var relativePath = fileInfo.FullName.Substring(backup.SourcePath.Length);
+                var targetFileInfo = new FileInfo(string.Concat(backup.TargetPath, relativePath));
+
+                if (targetFileInfo.Exists && fileInfo.LastWriteTime == targetFileInfo.LastWriteTime)
+                    continue;
+
+                updatedFiles.Add(fileInfo, targetFileInfo);
+            }
+            return updatedFiles;
+        }
+
+        private void PrepareBackup(IBackup backup, out CancellationTokenSource token, out ManualResetEvent pauseEvent,
+            out Task task)
+        {
+            if (!_backupCancellationTokens.TryGetValue(backup, out token) || token.Token.IsCancellationRequested)
+            {
+                token = new CancellationTokenSource();
+                _backupCancellationTokens[backup] = token;
+            }
+
+            if (!_backupResetEvents.TryGetValue(backup, out pauseEvent))
+            {
+                pauseEvent = new ManualResetEvent(false);
+                _backupResetEvents[backup] = pauseEvent;
+            }
+            pauseEvent.Set();
+
+            if (!_tasks.TryGetValue(backup, out task))
+            {
+                task = Task.Factory.StartNew(() => { backup.IsRunning = false; });
+            }
+        }
+
         private void OnBackupStarted(IBackup backup)
         {
             BackupStarted?.Invoke(backup);
@@ -511,5 +526,7 @@ namespace USBBackup
                 _state = BackupState.Running;
             StateChanged?.Invoke(_state);
         }
+
+        #endregion
     }
 }

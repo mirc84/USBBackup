@@ -17,10 +17,16 @@ namespace USBBackupGUI
 
     class MainWindowViewModel : NotificationObject
     {
+        #region Fields
+
         private readonly UsbDeviceRepository _usbDeviceRepository;
         private IList<DriveNotificationWrapper> _usbDevices;
         private BackupHandler _backupHandler;
         private Dispatcher _dispatcher;
+
+        #endregion
+
+        #region Constructor
 
         public MainWindowViewModel(UsbDeviceRepository usbDeviceRepository, BackupHandler backupHandler, Dispatcher dispatcher)
         {
@@ -38,6 +44,39 @@ namespace USBBackupGUI
             UsbDevices = new ObservableCollection<DriveNotificationWrapper>(_usbDeviceRepository.USBDevices.Select(x => new DriveNotificationWrapper(x)).ToList());
         }
 
+        #endregion
+
+        #region Properties
+
+        public IList<DriveNotificationWrapper> UsbDevices
+        {
+            get { return _usbDevices; }
+            set
+            {
+                _usbDevices = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ICommand AddBackupCommand { get; }
+        public ICommand RemoveBackupCommand { get; }
+        public ICommand RunBackupCommand { get; }
+        public ICommand CancelBackupCommand { get; }
+        public ICommand RunPauseResumeBackupCommand { get; }
+        public ICommand RunAllBackupsCommand { get; }
+        public ICommand SaveCommand { get; }
+
+        #endregion
+
+        #region Events
+
+        public event AskUserEventHandler UserChoiceRequested;
+        public event NotifyUserEventHandler UserNotification;
+
+        #endregion
+
+        #region Non Public Methods
+
         protected virtual MessageBoxResult OnUserChoiceRequested(string message, string caption, MessageBoxButton? result = null)
         {
             return (UserChoiceRequested?.Invoke(message, caption, result ?? MessageBoxButton.YesNo)).GetValueOrDefault(MessageBoxResult.No);
@@ -47,9 +86,6 @@ namespace USBBackupGUI
         {
             UserNotification?.Invoke(message, caption);
         }
-
-        public event AskUserEventHandler UserChoiceRequested;
-        public event NotifyUserEventHandler UserNotification;
 
         private void RunPauseResumeBackup(object obj)
         {
@@ -70,7 +106,7 @@ namespace USBBackupGUI
             if (backup == null)
                 return;
 
-            var choice = OnUserChoiceRequested(new Loc(nameof(StringResource.UserChoice_HardCancel)), 
+            var choice = OnUserChoiceRequested(new Loc(nameof(StringResource.UserChoice_HardCancel)),
                 new Loc(nameof(StringResource.UserChoice_HardCancel_Caption)), MessageBoxButton.YesNoCancel);
             if (choice == MessageBoxResult.Cancel)
                 return;
@@ -88,7 +124,7 @@ namespace USBBackupGUI
             if (drive == null)
                 return;
 
-            var choice = OnUserChoiceRequested(new Loc(nameof(StringResource.UserChoice_RemoveBackup)), 
+            var choice = OnUserChoiceRequested(new Loc(nameof(StringResource.UserChoice_RemoveBackup)),
                 new Loc(nameof(StringResource.UserChoiceCaption_RemoveBackup)));
             if (choice != MessageBoxResult.Yes)
                 return;
@@ -115,27 +151,9 @@ namespace USBBackupGUI
         {
             foreach (var device in UsbDevices)
             {
-                _backupHandler.HandleBackup(device);
+                _backupHandler.HandleBackup(device.Drive);
             }
         }
-
-        public IList<DriveNotificationWrapper> UsbDevices
-        {
-            get { return _usbDevices; }
-            set
-            {
-                _usbDevices = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public ICommand AddBackupCommand { get; }
-        public ICommand RemoveBackupCommand { get; }
-        public ICommand RunBackupCommand { get; }
-        public ICommand CancelBackupCommand { get; }
-        public ICommand RunPauseResumeBackupCommand { get; }
-        public ICommand RunAllBackupsCommand { get; }
-        public ICommand SaveCommand { get; }
 
         private void OnUSBDevicesChanged(Drive drive)
         {
@@ -165,7 +183,7 @@ namespace USBBackupGUI
             var drive = obj as DriveNotificationWrapper;
             if (drive != null)
             {
-                _backupHandler.HandleBackup(drive);
+                _backupHandler.HandleBackup(drive.Drive);
                 return;
             }
             var backup = obj as Backup;
@@ -175,5 +193,7 @@ namespace USBBackupGUI
                 return;
             }
         }
+
+        #endregion
     }
 }

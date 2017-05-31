@@ -133,13 +133,13 @@
       <DependentUpon>ValueInputControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindowViewModel.cs" />
+    <Compile Include="NotificationWrapper.cs" />
     <Compile Include="Resources\ImageResource.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>ImageResource.resx</DependentUpon>
     </Compile>
     <Compile Include="TrayIcon.cs" />
-    <Compile Include="UIElementExtension.cs" />
     <Page Include="Controls\BackupControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

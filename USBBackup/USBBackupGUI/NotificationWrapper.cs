@@ -8,27 +8,27 @@ namespace USBBackup
 {
     public class DriveNotificationWrapper : NotificationObject
     {
+        #region Fields
+
         private readonly Drive _drive;
+
+        #endregion
+
+        #region Constructor
 
         public DriveNotificationWrapper(Drive drive)
         {
             _drive = drive;
             _drive.PropertyChanged += (s, name) => OnPropertyChanged(name.PropertyName);
-            Backups  = new ObservableCollection<Backup>(drive.Backups);
+            Backups = new ObservableCollection<Backup>(drive.Backups);
             Backups.CollectionChanged += BackupsOnCollectionChanged;
         }
 
-        public Drive Drive => _drive;
+        #endregion
+        
+        #region Properties
 
-        private void BackupsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
-        {
-            if (args.OldItems != null)
-                foreach (var oldItem in args.OldItems.OfType<Backup>())
-                    _drive.Backups.Remove(oldItem);
-            if (args.NewItems != null)
-                foreach (var newItem in args.NewItems.OfType<Backup>())
-                    _drive.Backups.Add(newItem);
-        }
+        public Drive Drive => _drive;
 
         public ObservableCollection<Backup> Backups { get; set; }
 
@@ -47,5 +47,21 @@ namespace USBBackup
                 OnPropertyChanged();
             }
         }
+
+        #endregion
+
+        #region Non Public Methods
+
+        private void BackupsOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            if (args.OldItems != null)
+                foreach (var oldItem in args.OldItems.OfType<Backup>())
+                    _drive.Backups.Remove(oldItem);
+            if (args.NewItems != null)
+                foreach (var newItem in args.NewItems.OfType<Backup>())
+                    _drive.Backups.Add(newItem);
+        }
+
+        #endregion
     }
 }

@@ -14,10 +14,16 @@ namespace USBBackupGUI.Controls
     /// </summary>
     public partial class BackupControl : UserControl
     {
+        #region Constructor
+
         public BackupControl()
         {
             InitializeComponent();
         }
+
+        #endregion
+
+        #region Properties
 
         public Backup Backup
         {
@@ -59,6 +65,10 @@ namespace USBBackupGUI.Controls
         public static readonly DependencyProperty RemoveBackupCommandProperty =
             DependencyProperty.Register("RemoveBackupCommand", typeof(ICommand), typeof(BackupControl), new PropertyMetadata(default(ICommand)));
 
+        #endregion
+
+        #region Non Public Methods
+
         private void FolderBrowseControl_ValueChanged(object source, RoutedEventArgs e)
         {
             var ctrl = source as FolderBrowseControl;
@@ -74,9 +84,11 @@ namespace USBBackupGUI.Controls
                 element.GetBindingExpression(FolderBrowseControl.SelectedPathProperty)?.UpdateSource();
             }
         }
+
+        #endregion
     }
 
-    class AreNotEqualToVisibilityConverter : IMultiValueConverter
+    internal class AreNotEqualToVisibilityConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {

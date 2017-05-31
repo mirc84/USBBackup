@@ -4,8 +4,14 @@ namespace USBBackup
 {
     public struct Size
     {
+        #region Fields
+
         private double _stringValue;
         private string _unit;
+
+        #endregion
+
+        #region Constructor
 
         public Size(long value)
         {
@@ -16,7 +22,15 @@ namespace USBBackup
             UpdateStringValue();
         }
 
+        #endregion
+        
+        #region Properties
+
         public long Value { get; set; }
+
+        #endregion
+
+        #region Operators
 
         public static implicit operator Size(long value)
         {
@@ -27,6 +41,30 @@ namespace USBBackup
         {
             return value.Value;
         }
+
+        #endregion
+
+        #region Public Methods
+
+        public override bool Equals(object obj)
+        {
+            var size = obj as Size?;
+            return size != null && size.Value == Value;
+        }
+
+        public override int GetHashCode()
+        {
+            return Value.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return $"{_stringValue} {_unit}";
+        }
+
+        #endregion
+
+        #region Non Public Methods
 
         private void UpdateStringValue()
         {
@@ -66,20 +104,6 @@ namespace USBBackup
             _stringValue = Math.Round(_stringValue, decimals);
         }
 
-        public override bool Equals(object obj)
-        {
-            var size = obj as Size?;
-            return size != null && size.Value == Value;
-        }
-
-        public override int GetHashCode()
-        {
-            return Value.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return $"{_stringValue} {_unit}";
-        }
+        #endregion
     }
 }
