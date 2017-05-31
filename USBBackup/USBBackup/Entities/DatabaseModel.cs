@@ -1,11 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using USBBackup.Core;
 
 namespace USBBackup.Entities
 {
-    public abstract class DatabaseModel : NotificationObject, IDataErrorInfo
+    public abstract class DatabaseModel : INotifyPropertyChanged, IDataErrorInfo
     {
         #region Properties
 
@@ -31,6 +32,17 @@ namespace USBBackup.Entities
         protected virtual string Validate(string columnName)
         {
             return null;
+        }
+
+        #endregion
+
+        #region INotifyPropertyChanged Implementation
+
+        public virtual event PropertyChangedEventHandler PropertyChanged;
+
+        public virtual void OnPropertyChanged([CallerMemberName]string name = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
         #endregion

@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackupHandler.cs" />
+    <Compile Include="BackupRunner.cs" />
     <Compile Include="BackupState.cs" />
     <Compile Include="Core\NotificationObject.cs" />
     <Compile Include="Core\RelayCommand.cs" />
