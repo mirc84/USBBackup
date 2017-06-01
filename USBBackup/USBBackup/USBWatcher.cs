@@ -10,16 +10,30 @@ namespace USBBackup
 
     public class USBWatcher : NotificationObject
     {
+        #region Fields
+
         private ManagementEventWatcher _changedWatcher;
         private readonly IList<Drive> _drives;
+
+        #endregion
+
+        #region Constructor
 
         public USBWatcher()
         {
             _drives = new List<Drive>();
         }
 
+        #endregion
+        
+        #region Events
+
         public event DriveAttachedHandler DriveAttached;
         public event DriveAttachedHandler DriveDetached;
+
+        #endregion
+
+        #region Public Methods
 
         public void Init()
         {
@@ -27,40 +41,6 @@ namespace USBBackup
             _changedWatcher = new ManagementEventWatcher(changedQuery);
             _changedWatcher.EventArrived += OnVolumeChangeEvent;
             _changedWatcher.Start();
-        }
-
-        private void OnVolumeChangeEvent(object sender, EventArrivedEventArgs e)
-        {
-            switch ((ushort)e.NewEvent["EventType"])
-            {
-                case 2: // added
-                    OnVolumeAttached(e.NewEvent["DriveName"].ToString());
-                    break;
-                case 3: // added
-                    OnVolumeDetached(e.NewEvent["DriveName"].ToString());
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        private void OnVolumeAttached(string driveLetter)
-        {
-            var drive = LoadDrives(driveLetter).FirstOrDefault();
-            if (drive == null)
-                return;
-            
-            OnDeviceAttached(drive);
-        }
-
-        private void OnVolumeDetached(string driveLetter)
-        {
-            var drive = _drives.FirstOrDefault(x => x.DriveLetter == driveLetter);
-            if (drive == null)
-                return;
-
-            _drives.Remove(drive);
-            OnDeviceDetached(drive);
         }
 
         public IEnumerable<Drive> LoadDrives(string driveLetter = null)
@@ -105,6 +85,44 @@ namespace USBBackup
             }
         }
 
+        #endregion
+
+        #region Non Public Methods
+
+        private void OnVolumeChangeEvent(object sender, EventArrivedEventArgs e)
+        {
+            switch ((ushort)e.NewEvent["EventType"])
+            {
+                case 2: // added
+                    OnVolumeAttached(e.NewEvent["DriveName"].ToString());
+                    break;
+                case 3: // added
+                    OnVolumeDetached(e.NewEvent["DriveName"].ToString());
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void OnVolumeAttached(string driveLetter)
+        {
+            var drive = LoadDrives(driveLetter).FirstOrDefault();
+            if (drive == null)
+                return;
+
+            OnDeviceAttached(drive);
+        }
+
+        private void OnVolumeDetached(string driveLetter)
+        {
+            var drive = _drives.FirstOrDefault(x => x.DriveLetter == driveLetter);
+            if (drive == null)
+                return;
+
+            _drives.Remove(drive);
+            OnDeviceDetached(drive);
+        }
+
         private ManagementObject GetDiskVolume(string volumeLetter)
         {
             var collection = new ManagementObjectSearcher($"ASSOCIATORS OF {{Win32_LogicalDisk.DeviceID='{volumeLetter}'}} WHERE AssocClass=Win32_LogicalDiskToPartition").Get();
@@ -135,5 +153,7 @@ namespace USBBackup
         {
             DriveDetached?.Invoke(deviceInfo);
         }
+
+        #endregion
     }
 }

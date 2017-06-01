@@ -1,19 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace USBBackupGUI.Controls
 {
@@ -22,10 +13,16 @@ namespace USBBackupGUI.Controls
     /// </summary>
     public partial class ValueInputControl : UserControl
     {
+        #region Constructor
+
         public ValueInputControl()
         {
             InitializeComponent();
         }
+
+        #endregion
+
+        #region Properties
 
         public int Value
         {
@@ -37,8 +34,6 @@ namespace USBBackupGUI.Controls
         public static readonly DependencyProperty ValueProperty =
             DependencyProperty.Register("Value", typeof(int), typeof(ValueInputControl), new PropertyMetadata(0, OnValueChanged));
 
-
-
         public int MaxValue
         {
             get { return (int)GetValue(MaxValueProperty); }
@@ -48,6 +43,10 @@ namespace USBBackupGUI.Controls
         // Using a DependencyProperty as the backing store for MaxValue.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MaxValueProperty =
             DependencyProperty.Register("MaxValue", typeof(int), typeof(ValueInputControl), new PropertyMetadata(0));
+
+        #endregion
+
+        #region Non Public Methods
 
         private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -65,9 +64,11 @@ namespace USBBackupGUI.Controls
         {
             e.Handled = !Regex.IsMatch(e.Text, "^\\d*$");
         }
+
+        #endregion
     }
 
-    class IntToStringConverter : IValueConverter
+    internal class IntToStringConverter : IValueConverter
     {
         object IValueConverter.Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

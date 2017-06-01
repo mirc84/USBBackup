@@ -1114,7 +1114,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:USBBackup, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL"
+            "AssemblyAsmDisplayName" = "8:USBBackup, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
                     "_1AD7524B31A71437C2178FA076397F69"
@@ -2944,15 +2944,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:USB Backup"
-        "ProductCode" = "8:{7C1CA5B2-1BE8-4A4C-B3C1-AE09BD1E7B34}"
-        "PackageCode" = "8:{570FF924-6B23-4E17-A369-F754E52EDA07}"
+        "ProductCode" = "8:{1A022449-590B-4320-9D43-DA3DAC4C0190}"
+        "PackageCode" = "8:{FCAA6670-F645-4EBC-8874-1EDFC574580C}"
         "UpgradeCode" = "8:{1F0E5D30-B85C-4E4A-8D7E-97199FD05051}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.2"
+        "ProductVersion" = "8:0.1.3"
         "Manufacturer" = "8:MKay"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

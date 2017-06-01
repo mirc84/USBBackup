@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using USBBackup.Entities;
 
 namespace USBBackup
 {
@@ -16,5 +17,6 @@ namespace USBBackup
         Size FinishedBytes { get; set; }
         Size CurrentFileBytes { get; set; }
         Size CurrentFileWrittenBytes { get; set; }
+        Drive Drive { get; }
     }
 }

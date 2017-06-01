@@ -14,6 +14,8 @@ namespace USBBackupGUI
 {
     public class App : Application
     {
+        #region Fields
+
         private USBWatcher _watcher;
         private UsbDeviceRepository _deviceRepository;
         private DatabaseConnection _databaseContext;
@@ -22,10 +24,18 @@ namespace USBBackupGUI
         private MainWindowViewModel _viewModel;
         private TrayIcon _trayIcon;
 
+        #endregion
+
+        #region Constructor
+
         public App()
         {
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
         }
+
+        #endregion
+
+        #region Public Methods
 
         [STAThread]
         public static int Main(params string[] args)
@@ -44,6 +54,10 @@ namespace USBBackupGUI
                 return 1;
             }
         }
+
+        #endregion
+
+        #region Non Public Methods
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -130,7 +144,7 @@ namespace USBBackupGUI
 
         private void OnCancelBackupsRequested(object sender, EventArgs e)
         {
-            var choice = MessageBox.Show(_window, new Loc(nameof(StringResource.UserChoice_HardCancel)), 
+            var choice = MessageBox.Show(_window, new Loc(nameof(StringResource.UserChoice_HardCancel)),
                 new Loc(nameof(StringResource.UserChoice_HardCancel_Caption)), MessageBoxButton.YesNoCancel);
             if (choice == MessageBoxResult.Cancel)
                 return;
@@ -149,5 +163,7 @@ namespace USBBackupGUI
             _backupHandler.CancelBackups(true);
             Shutdown();
         }
+
+        #endregion
     }
 }

@@ -8,11 +8,17 @@ namespace USBBackupGUI.Controls
     /// </summary>
     public partial class TimeSpanInputControl
     {
+        #region Constructor
+
         public TimeSpanInputControl()
         {
             InitializeComponent();
         }
-        
+
+        #endregion
+
+        #region Properties
+
         public TimeSpan TimeSpan
         {
             get { return (TimeSpan)GetValue(TimeSpanProperty); }
@@ -43,8 +49,6 @@ namespace USBBackupGUI.Controls
         public static readonly DependencyProperty MinutesProperty =
             DependencyProperty.Register("Minutes", typeof(int), typeof(TimeSpanInputControl), new PropertyMetadata(0, OnValueChanged));
 
-
-
         public int Seconds
         {
             get { return (int)GetValue(SecondsProperty); }
@@ -55,6 +59,10 @@ namespace USBBackupGUI.Controls
         public static readonly DependencyProperty SecondsProperty =
             DependencyProperty.Register("Seconds", typeof(int), typeof(TimeSpanInputControl), new PropertyMetadata(0, OnValueChanged));
         private bool _updatingValues;
+
+        #endregion
+
+        #region Non Public Methods
 
         private static void OnTimeSpanChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -83,5 +91,6 @@ namespace USBBackupGUI.Controls
                 TimeSpan = new TimeSpan(Hours, Minutes, Seconds);
         }
 
+        #endregion
     }
 }

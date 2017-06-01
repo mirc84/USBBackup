@@ -19,7 +19,13 @@ namespace USBBackupGUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region Fields
+
         private MainWindowViewModel _viewModel;
+
+        #endregion
+
+        #region Constructor
 
         public MainWindow()
         {
@@ -29,9 +35,16 @@ namespace USBBackupGUI
 
         }
 
+        #endregion
+
+        #region Non Public Methods
+
         private void OnClosing(object sender, CancelEventArgs args)
         {
-            var choice = MessageBox.Show(new Loc(nameof(StringResource.MainWindow_ClosingSaveQuestion)), 
+            if (_viewModel.UsbDevices.SelectMany(x => x.Backups).All(x => !x.IsModified()))
+                return;
+
+            var choice = MessageBox.Show(new Loc(nameof(StringResource.MainWindow_ClosingSaveQuestion)),
                 new Loc(nameof(StringResource.MainWindow_ClosingSaveQuestion_Caption)), MessageBoxButton.YesNoCancel);
             if (choice == MessageBoxResult.Yes)
                 _viewModel.SaveCommand.Execute(null);
@@ -41,7 +54,7 @@ namespace USBBackupGUI
 
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            _viewModel = e.NewValue as MainWindowViewModel; 
+            _viewModel = e.NewValue as MainWindowViewModel;
             _viewModel.UserChoiceRequested += OnUserChoiceRequested;
             _viewModel.UserNotification += OnUserNotification;
         }
@@ -56,7 +69,7 @@ namespace USBBackupGUI
             var result = MessageBox.Show(message, caption, results);
             return result;
         }
-        
+
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             USBBackup.Properties.Settings.Default.Reload();
@@ -104,9 +117,11 @@ namespace USBBackupGUI
                 element.GetBindingExpression(FolderBrowseControl.SelectedPathProperty)?.UpdateSource();
             }
         }
+
+        #endregion
     }
 
-    class NotNullToVisibilityConverter : IValueConverter
+    internal class NotNullToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

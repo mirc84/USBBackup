@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using Ookii.Dialogs.Wpf;
 
@@ -9,12 +8,28 @@ namespace USBBackupGUI.Controls
 
     public partial class FolderBrowseControl : UserControl
     {
+        #region Constructor
+
         public FolderBrowseControl()
         {
             InitializeComponent();
         }
 
-        public event ValueChangedEventHandler ValueChanged;
+        #endregion
+
+        #region Properties
+
+
+        public bool IsReadOnly
+        {
+            get { return (bool)GetValue(IsReadOnlyProperty); }
+            set { SetValue(IsReadOnlyProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for IsReadOnly.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty IsReadOnlyProperty =
+            DependencyProperty.Register("IsReadOnly", typeof(bool), typeof(FolderBrowseControl), new PropertyMetadata(false));
+
 
         public static readonly DependencyProperty PathRestrictionProperty = DependencyProperty.Register(
             "PathRestriction", typeof(string), typeof(FolderBrowseControl), new PropertyMetadata(default(string)));
@@ -34,6 +49,16 @@ namespace USBBackupGUI.Controls
             set { SetValue(SelectedPathProperty, value); }
         }
 
+        #endregion
+
+        #region Events
+
+        public event ValueChangedEventHandler ValueChanged;
+
+        #endregion
+
+        #region Non Public Methods
+
         private static void SelectedPathChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var ctrl = (FolderBrowseControl)d;
@@ -42,7 +67,7 @@ namespace USBBackupGUI.Controls
 
         private void OpenButton_OnClick(object sender, RoutedEventArgs e)
         {
-            var dialog = new VistaFolderBrowserDialog {SelectedPath = SelectedPath};
+            var dialog = new VistaFolderBrowserDialog { SelectedPath = SelectedPath };
             if (dialog.ShowDialog().GetValueOrDefault())
             {
                 while (PathRestriction != null && !dialog.SelectedPath.StartsWith(PathRestriction, System.StringComparison.InvariantCultureIgnoreCase))
@@ -58,5 +83,7 @@ namespace USBBackupGUI.Controls
         {
             ValueChanged?.Invoke(this, new RoutedEventArgs());
         }
+
+        #endregion
     }
 }

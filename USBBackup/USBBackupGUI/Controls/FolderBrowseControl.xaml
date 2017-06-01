@@ -4,18 +4,25 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:USBBackupGUI.Controls"
+             xmlns:converters="clr-namespace:USBBackupGUI.Controls.Converters"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <converters:InvertBoolConverter x:Key="_invertBoolConverter" />
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"></ColumnDefinition>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <TextBox Margin="4" MinWidth="100" Padding="4" FontSize="14"
-                 VerticalContentAlignment="Center"
+        <TextBox Margin="0,0,4,0" MinWidth="100" Padding="4" FontSize="14" VerticalContentAlignment="Center"
+                 IsReadOnly="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:FolderBrowseControl}, Path=IsReadOnly}"
                  Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:FolderBrowseControl}, Path=SelectedPath, Mode=TwoWay}"></TextBox>
-        <Button Margin="4" Grid.Column="1" 
+        <Button Grid.Column="1" 
+                IsEnabled="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:FolderBrowseControl}, Path=IsReadOnly, Converter={StaticResource _invertBoolConverter}}"
                 Click="OpenButton_OnClick">
             <Image Source="/Resources/Images/Folder-icon.png" />
         </Button>

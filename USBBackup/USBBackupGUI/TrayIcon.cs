@@ -7,14 +7,20 @@ using USBBackupGUI.Resources;
 
 namespace USBBackupGUI
 {
-    class TrayIcon
+    internal class TrayIcon
     {
+        #region Fields
+
         private MainWindow _window;
         private NotifyIcon _icon;
         private WindowState _lastState;
         private MenuItem _pauseItem;
         private MenuItem _cancelItem;
         private bool _areBackupsRunning;
+
+        #endregion
+
+        #region Constructor
 
         public TrayIcon(MainWindow window)
         {
@@ -34,12 +40,10 @@ namespace USBBackupGUI
             _window.Closed += OnClosing;
         }
 
-        private void OnClosing(object sender, EventArgs e)
-        {
-            _icon.Visible = false;
-            _icon.Dispose();
-        }
+        #endregion
         
+        #region Properties
+
         public bool AreBackupsRunning
         {
             get { return _areBackupsRunning; }
@@ -51,9 +55,37 @@ namespace USBBackupGUI
             }
         }
 
+        #endregion
+
+        #region Events
+
         public event EventHandler RunBackupRequested;
         public event EventHandler PauseResumeBackupsRequested;
         public event EventHandler CancelBackupsRequested;
+
+        #endregion
+
+        private void OnClosing(object sender, EventArgs e)
+        {
+            _icon.Visible = false;
+            _icon.Dispose();
+        }
+
+        #region Public Methods
+
+        public void ShowWindow()
+        {
+            if (_window.ShowInTaskbar)
+                return;
+
+            _window.ShowInTaskbar = true;
+            _window.WindowState = _lastState;
+            _window.Visibility = Visibility.Visible;
+        }
+
+        #endregion
+
+        #region Non Public Methods
 
         private void SetMenuItems()
         {
@@ -125,7 +157,7 @@ namespace USBBackupGUI
             if (!USBBackup.Properties.Settings.Default.NotifyCleanupStarted)
                 return;
 
-            _icon.ShowBalloonTip(500, new Loc(nameof(StringResource.TrayIcon_CleanUpStarted_Caption)), 
+            _icon.ShowBalloonTip(500, new Loc(nameof(StringResource.TrayIcon_CleanUpStarted_Caption)),
                 new Loc(nameof(StringResource.TrayIcon_CleanUpStarted), backup.TargetPath), ToolTipIcon.Info);
         }
 
@@ -134,7 +166,7 @@ namespace USBBackupGUI
             if (!USBBackup.Properties.Settings.Default.NotifyCleanupFinished)
                 return;
 
-            _icon.ShowBalloonTip(500, new Loc(nameof(StringResource.TrayIcon_CleanUpFinished_Caption)), 
+            _icon.ShowBalloonTip(500, new Loc(nameof(StringResource.TrayIcon_CleanUpFinished_Caption)),
                 new Loc(nameof(StringResource.TrayIcon_CleanUpFinished), backup.TargetPath), ToolTipIcon.Info);
         }
 
@@ -143,7 +175,7 @@ namespace USBBackupGUI
             if (!USBBackup.Properties.Settings.Default.NotifyBackupFinished)
                 return;
 
-            _icon.ShowBalloonTip(500, new Loc(nameof(StringResource.TrayIcon_BackupFinished_Caption)), 
+            _icon.ShowBalloonTip(500, new Loc(nameof(StringResource.TrayIcon_BackupFinished_Caption)),
                 new Loc(nameof(StringResource.TrayIcon_BackupFinished), backup.TargetPath), ToolTipIcon.Info);
 
         }
@@ -153,7 +185,7 @@ namespace USBBackupGUI
             if (!USBBackup.Properties.Settings.Default.NotifyBackupStarted)
                 return;
 
-            _icon.ShowBalloonTip(500, new Loc(nameof(StringResource.TrayIcon_BackupStarted_Caption)), 
+            _icon.ShowBalloonTip(500, new Loc(nameof(StringResource.TrayIcon_BackupStarted_Caption)),
                 new Loc(nameof(StringResource.TrayIcon_BackupStarted), backup.TargetPath), ToolTipIcon.Info);
         }
 
@@ -187,16 +219,8 @@ namespace USBBackupGUI
         private void OnIconDoubleClick(object sender, EventArgs e)
         {
             ShowWindow();
-        }
+        } 
 
-        public void ShowWindow()
-        {
-            if (_window.ShowInTaskbar)
-                return;
-
-            _window.ShowInTaskbar = true;
-            _window.WindowState = _lastState;
-            _window.Visibility = Visibility.Visible;
-        }
+        #endregion
     }
 }

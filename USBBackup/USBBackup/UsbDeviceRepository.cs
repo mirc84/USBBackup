@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Timers;
-using System.Windows.Threading;
 using USBBackup.DatabaseAccess;
 using USBBackup.Entities;
 
@@ -16,11 +12,17 @@ namespace USBBackup
 
     public class UsbDeviceRepository
     {
+        #region Fields
+
         private readonly USBWatcher _watcher;
         private readonly DatabaseConnection _databaseConncetion;
         private readonly BackupHandler _backupHandler;
         private Timer _backupTimer;
         private IDictionary<Backup, FileSystemWatcher> _backupFileWatchers;
+
+        #endregion
+
+        #region Constructor
 
         public UsbDeviceRepository(USBWatcher watcher, DatabaseConnection databaseConncetion, BackupHandler backupHandler)
         {
@@ -38,33 +40,21 @@ namespace USBBackup
             Properties.Settings.Default.PropertyChanged += OnSettingsChanged;
         }
 
-        private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
-        {
-            _backupTimer.Stop();
-            _backupTimer.Interval = Properties.Settings.Default.BackupInterval.TotalMilliseconds;
-
-            foreach (var fileWatcher in _backupFileWatchers.Values)
-            {
-                fileWatcher.EnableRaisingEvents = Properties.Settings.Default.WatchBackupSources;
-            }
-
-            if (Properties.Settings.Default.HandleBackupOnInterval)
-            {
-                _backupTimer.Start();
-            }
-        }
-
-        private void RunAllBackups()
-        {
-            foreach (var drive in USBDevices)
-            {
-                _backupHandler.HandleBackup(drive);
-            }
-        }
+        #endregion
+        
+        #region Properties
 
         public IList<Drive> USBDevices { get; }
 
+        #endregion
+
+        #region Events
+
         public event DeviceChangedEventHandler USBDevicesChanged;
+
+        #endregion
+
+        #region Public Methods
 
         public void Load()
         {
@@ -72,8 +62,13 @@ namespace USBBackup
             foreach (var usbDeviceInfo in usbDevices)
             {
                 USBDevices.Add(usbDeviceInfo);
-                foreach (var backup in usbDeviceInfo.Backups.Where(x=> x.SourcePath != null && Directory.Exists(x.SourcePath)))
+                foreach (var backup in usbDeviceInfo.Backups)
                 {
+                    backup.SetDataSaved();
+
+                    if (backup.SourcePath == null || !Directory.Exists(backup.SourcePath))
+                        continue;
+
                     var watcher = new FileSystemWatcher(backup.SourcePath)
                     {
                         EnableRaisingEvents = true,
@@ -84,6 +79,7 @@ namespace USBBackup
                     watcher.Deleted += (s, f) => OnDirDeleted(backup, f);
                     _backupFileWatchers[backup] = watcher;
                 }
+                OnUSBDevicesChanged(usbDeviceInfo);
             }
             var attachedUSBDevices = _watcher.LoadDrives().ToList();
             foreach (var attachedUSBDevice in attachedUSBDevices)
@@ -107,6 +103,34 @@ namespace USBBackup
         public void Save()
         {
             _databaseConncetion.SaveDevices(USBDevices);
+        }
+
+        #endregion
+
+        #region Non Public Methods
+
+        private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
+        {
+            _backupTimer.Stop();
+            _backupTimer.Interval = Properties.Settings.Default.BackupInterval.TotalMilliseconds;
+
+            foreach (var fileWatcher in _backupFileWatchers.Values)
+            {
+                fileWatcher.EnableRaisingEvents = Properties.Settings.Default.WatchBackupSources;
+            }
+
+            if (Properties.Settings.Default.HandleBackupOnInterval)
+            {
+                _backupTimer.Start();
+            }
+        }
+
+        private void RunAllBackups()
+        {
+            foreach (var drive in USBDevices)
+            {
+                _backupHandler.HandleBackup(drive);
+            }
         }
 
         private void OnUSBDriveAttached(Drive drive)
@@ -153,5 +177,7 @@ namespace USBBackup
         {
             USBDevicesChanged?.Invoke(drive);
         }
+
+        #endregion
     }
 }

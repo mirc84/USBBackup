@@ -1,25 +1,23 @@
-﻿using USBBackup.Strings;
+﻿using System;
+using USBBackup.Strings;
 
 namespace USBBackup.Entities
 {
     public class Backup : DatabaseModel, IBackup
     {
-        private string _sourcePath;
-        private string _targetPath;
-        private bool _isEnabled;
-        private bool _isInverse;
-        private bool _isRunning;
-        private bool _isPaused;
-        private string _currentFile;
+        #region Fields
 
-        private Size _bytesToWrite;
-        private Size _writtenBytes;
-        private Size _finishedBytes;
-        private Size _currentFileBytes;
-        private Size _currentFileWrittenBytes;
+        private string _savedSourcePath;
+        private string _savedTargetPath;
+        private bool _savedIsEnabled;
+
+        #endregion
+
+        #region Properties
 
         public virtual Drive Drive { get; set; }
 
+        private string _sourcePath;
         public virtual string SourcePath
         {
             get { return _sourcePath; }
@@ -30,6 +28,7 @@ namespace USBBackup.Entities
             }
         }
 
+        private string _targetPath;
         public virtual string TargetPath
         {
             get { return _targetPath; }
@@ -40,12 +39,14 @@ namespace USBBackup.Entities
             }
         }
 
+        private bool _isInverse;
         public virtual bool IsInverse
         {
             get { return _isInverse; }
             set { _isInverse = value; }
         }
 
+        private bool _isEnabled;
         public virtual bool IsEnabled
         {
             get { return _isEnabled; }
@@ -56,6 +57,7 @@ namespace USBBackup.Entities
             }
         }
 
+        private bool _isRunning;
         public virtual bool IsRunning
         {
             get { return _isRunning; }
@@ -66,6 +68,7 @@ namespace USBBackup.Entities
             }
         }
 
+        private bool _isPaused;
         public virtual bool IsPaused
         {
             get { return _isPaused; }
@@ -76,6 +79,7 @@ namespace USBBackup.Entities
             }
         }
 
+        private string _currentFile;
         public virtual string CurrentFile
         {
             get { return _currentFile; }
@@ -86,6 +90,7 @@ namespace USBBackup.Entities
             }
         }
 
+        private Size _bytesToWrite;
         public virtual Size BytesToWrite
         {
             get { return _bytesToWrite; }
@@ -96,6 +101,7 @@ namespace USBBackup.Entities
             }
         }
 
+        private Size _writtenBytes;
         public virtual Size WrittenBytes
         {
             get { return _writtenBytes; }
@@ -107,6 +113,7 @@ namespace USBBackup.Entities
         }
 
 
+        private Size _finishedBytes;
         public virtual Size FinishedBytes
         {
             get { return _finishedBytes; }
@@ -117,6 +124,7 @@ namespace USBBackup.Entities
             }
         }
 
+        private Size _currentFileBytes;
         public virtual Size CurrentFileBytes
         {
             get { return _currentFileBytes; }
@@ -127,6 +135,7 @@ namespace USBBackup.Entities
             }
         }
 
+        private Size _currentFileWrittenBytes;
         public virtual Size CurrentFileWrittenBytes
         {
             get { return _currentFileWrittenBytes; }
@@ -134,6 +143,43 @@ namespace USBBackup.Entities
             {
                 _currentFileWrittenBytes = value;
                 OnPropertyChanged();
+            }
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        public virtual void SetDataSaved()
+        {
+            _savedSourcePath = SourcePath;
+            _savedTargetPath = TargetPath;
+            _savedIsEnabled = IsEnabled;
+        }
+
+        public virtual bool IsModified()
+        {
+            return
+                !(_savedSourcePath == SourcePath &&
+                _savedTargetPath == TargetPath &&
+                _savedIsEnabled == IsEnabled);
+        }
+
+        #endregion
+
+        #region Non Public Methods
+
+        protected internal virtual void SetDriveLetter(string driveLetter)
+        {
+            if (IsInverse)
+            {
+                SourcePath = driveLetter + SourcePath.Substring(driveLetter.Length);
+                _savedSourcePath = driveLetter + _savedSourcePath.Substring(driveLetter.Length);
+            }
+            else
+            {
+                TargetPath = driveLetter + TargetPath.Substring(driveLetter.Length);
+                _savedTargetPath = driveLetter + _savedTargetPath.Substring(driveLetter.Length);
             }
         }
 
@@ -161,17 +207,7 @@ namespace USBBackup.Entities
                     return base.Validate(columnName);
             }
         }
-    }
 
-    public class BackupInfoMap : DatabaseModelMap<Backup>
-    {
-        public BackupInfoMap()
-        {
-            Map(x => x.SourcePath);
-            Map(x => x.TargetPath);
-            Map(x => x.IsEnabled);
-            Map(x => x.IsInverse);
-            References(x => x.Drive).Column("Drive_id");
-        }
+        #endregion
     }
 }

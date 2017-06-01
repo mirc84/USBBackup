@@ -8,24 +8,29 @@ using System.IO;
 using NHibernate.Linq;
 using System.Linq;
 using USBBackup.Entities;
-using System;
 
 namespace USBBackup.DatabaseAccess
 {
     public class DatabaseConnection
     {
+        #region Fields
+
         private readonly string _dbPath;
         private readonly ISessionFactory _sessionFactory;
+
+        #endregion
+
+        #region Constructor
 
         public DatabaseConnection(string dbPath)
         {
             _dbPath = dbPath;
-            var cfg = new Configuration()
-            {
-                
-            };
             _sessionFactory = CreateSessionFactory();
         }
+
+        #endregion
+
+        #region Public Methods
 
         public IList<T> GetAll<T>()
         {
@@ -70,7 +75,15 @@ namespace USBBackup.DatabaseAccess
 
                 session.Flush();
             }
+            foreach (var backup in drive.Backups)
+            {
+                backup.SetDataSaved();
+            }
         }
+
+        #endregion
+
+        #region Non Public Methods
 
         private void DeleteIfPersited(Drive drive)
         {
@@ -107,13 +120,10 @@ namespace USBBackup.DatabaseAccess
 
         private void BuildSchema(Configuration config)
         {
-            // delete the existing db on each run
-            //if (File.Exists(_dbPath))
-            //    File.Delete(_dbPath);
+            var schemaExport = new SchemaExport(config);
+            schemaExport.Create(false, true);
+        } 
 
-            // this NHibernate tool takes a configuration (with mapping info in)
-            // and exports a database schema from it
-            new SchemaExport(config).Create(false, true);
-        }
+        #endregion
     }
 }

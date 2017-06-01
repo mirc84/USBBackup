@@ -1,14 +1,21 @@
-﻿using FluentNHibernate.Mapping;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using USBBackup.Core;
 
 namespace USBBackup.Entities
 {
     public abstract class DatabaseModel : INotifyPropertyChanged, IDataErrorInfo
     {
+        #region Properties
+
         public virtual Guid Id { get; set; }
+
+        #endregion
+        
+        #region IDataError Implementation
+
         public virtual string Error
         {
             get
@@ -22,31 +29,22 @@ namespace USBBackup.Entities
 
         public virtual string this[string columnName] => Validate(columnName);
 
-        public virtual event PropertyChangedEventHandler PropertyChanged;
-
-        public virtual void SetId()
+        protected virtual string Validate(string columnName)
         {
-            if (Id == Guid.Empty)
-                Id = Guid.NewGuid();
+            return null;
         }
+
+        #endregion
+
+        #region INotifyPropertyChanged Implementation
+
+        public virtual event PropertyChangedEventHandler PropertyChanged;
 
         public virtual void OnPropertyChanged([CallerMemberName]string name = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        protected virtual string Validate(string columnName)
-        {
-            return null;
-        }
-    }
-
-    public abstract class DatabaseModelMap<T> : ClassMap<T>
-        where T: DatabaseModel
-    {
-        public DatabaseModelMap()
-        {
-            Id(x => x.Id).Unique();
-        }
+        #endregion
     }
 }
