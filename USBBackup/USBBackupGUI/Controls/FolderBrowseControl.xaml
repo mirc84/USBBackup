@@ -18,10 +18,10 @@
             <ColumnDefinition Width="Auto"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <TextBox Margin="4" MinWidth="100" Padding="4" FontSize="14" VerticalContentAlignment="Center"
+        <TextBox Margin="0,0,4,0" MinWidth="100" Padding="4" FontSize="14" VerticalContentAlignment="Center"
                  IsReadOnly="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:FolderBrowseControl}, Path=IsReadOnly}"
                  Text="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:FolderBrowseControl}, Path=SelectedPath, Mode=TwoWay}"></TextBox>
-        <Button Margin="4" Grid.Column="1" 
+        <Button Grid.Column="1" 
                 IsEnabled="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:FolderBrowseControl}, Path=IsReadOnly, Converter={StaticResource _invertBoolConverter}}"
                 Click="OpenButton_OnClick">
             <Image Source="/Resources/Images/Folder-icon.png" />

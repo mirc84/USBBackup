@@ -41,6 +41,9 @@ namespace USBBackupGUI
 
         private void OnClosing(object sender, CancelEventArgs args)
         {
+            if (_viewModel.UsbDevices.SelectMany(x => x.Backups).All(x => !x.IsModified()))
+                return;
+
             var choice = MessageBox.Show(new Loc(nameof(StringResource.MainWindow_ClosingSaveQuestion)),
                 new Loc(nameof(StringResource.MainWindow_ClosingSaveQuestion_Caption)), MessageBoxButton.YesNoCancel);
             if (choice == MessageBoxResult.Yes)

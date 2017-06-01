@@ -75,6 +75,10 @@ namespace USBBackup.DatabaseAccess
 
                 session.Flush();
             }
+            foreach (var backup in drive.Backups)
+            {
+                backup.SetDataSaved();
+            }
         }
 
         #endregion

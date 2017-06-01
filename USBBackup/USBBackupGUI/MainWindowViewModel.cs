@@ -161,7 +161,7 @@ namespace USBBackupGUI
         {
             var existing = UsbDevices.FirstOrDefault(x => x.Drive.DeviceID == drive.DeviceID && x.Drive.PNPDeviceID == drive.PNPDeviceID);
             if (existing == null)
-                _dispatcher.BeginInvoke(new Action(() => UsbDevices.Add(new DriveNotificationWrapper(drive))));
+                _dispatcher.Invoke(new Action(() => UsbDevices.Add(new DriveNotificationWrapper(drive))));
             else
                 existing.IsAttached = drive.IsAttached;
         }

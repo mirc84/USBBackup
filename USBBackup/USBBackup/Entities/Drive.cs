@@ -9,6 +9,7 @@ namespace USBBackup.Entities
 
         private string _driveLetter;
         private string _model;
+        private bool _isAttached;
 
         #endregion
         
@@ -50,7 +51,16 @@ namespace USBBackup.Entities
         public virtual ulong FreeSpace { get; set; }
 
         public virtual string Description { get; set; }
-        public virtual bool IsAttached { get; set; }
+
+        public virtual bool IsAttached
+        {
+            get { return _isAttached; }
+            set
+            {
+                _isAttached = value;
+                OnPropertyChanged();
+            }
+        }
 
         public virtual IList<Backup> Backups { get; set; }
 
@@ -62,10 +72,7 @@ namespace USBBackup.Entities
         {
             foreach (var backup in Backups.Where(x => !string.IsNullOrEmpty(x.SourcePath) && !string.IsNullOrEmpty(x.TargetPath)))
             {
-                if (backup.IsInverse)
-                    backup.SourcePath = DriveLetter + backup.SourcePath.Substring(DriveLetter.Length);
-                else
-                    backup.TargetPath = DriveLetter + backup.TargetPath.Substring(DriveLetter.Length);
+                backup.SetDriveLetter(DriveLetter);
             }
         }
 

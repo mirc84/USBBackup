@@ -62,8 +62,13 @@ namespace USBBackup
             foreach (var usbDeviceInfo in usbDevices)
             {
                 USBDevices.Add(usbDeviceInfo);
-                foreach (var backup in usbDeviceInfo.Backups.Where(x => x.SourcePath != null && Directory.Exists(x.SourcePath)))
+                foreach (var backup in usbDeviceInfo.Backups)
                 {
+                    backup.SetDataSaved();
+
+                    if (backup.SourcePath == null || !Directory.Exists(backup.SourcePath))
+                        continue;
+
                     var watcher = new FileSystemWatcher(backup.SourcePath)
                     {
                         EnableRaisingEvents = true,
@@ -74,6 +79,7 @@ namespace USBBackup
                     watcher.Deleted += (s, f) => OnDirDeleted(backup, f);
                     _backupFileWatchers[backup] = watcher;
                 }
+                OnUSBDevicesChanged(usbDeviceInfo);
             }
             var attachedUSBDevices = _watcher.LoadDrives().ToList();
             foreach (var attachedUSBDevice in attachedUSBDevices)

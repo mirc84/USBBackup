@@ -1,9 +1,18 @@
-﻿using USBBackup.Strings;
+﻿using System;
+using USBBackup.Strings;
 
 namespace USBBackup.Entities
 {
     public class Backup : DatabaseModel, IBackup
     {
+        #region Fields
+
+        private string _savedSourcePath;
+        private string _savedTargetPath;
+        private bool _savedIsEnabled;
+
+        #endregion
+
         #region Properties
 
         public virtual Drive Drive { get; set; }
@@ -139,7 +148,40 @@ namespace USBBackup.Entities
 
         #endregion
 
+        #region Public Methods
+
+        public virtual void SetDataSaved()
+        {
+            _savedSourcePath = SourcePath;
+            _savedTargetPath = TargetPath;
+            _savedIsEnabled = IsEnabled;
+        }
+
+        public virtual bool IsModified()
+        {
+            return
+                !(_savedSourcePath == SourcePath &&
+                _savedTargetPath == TargetPath &&
+                _savedIsEnabled == IsEnabled);
+        }
+
+        #endregion
+
         #region Non Public Methods
+
+        protected internal virtual void SetDriveLetter(string driveLetter)
+        {
+            if (IsInverse)
+            {
+                SourcePath = driveLetter + SourcePath.Substring(driveLetter.Length);
+                _savedSourcePath = driveLetter + _savedSourcePath.Substring(driveLetter.Length);
+            }
+            else
+            {
+                TargetPath = driveLetter + TargetPath.Substring(driveLetter.Length);
+                _savedTargetPath = driveLetter + _savedTargetPath.Substring(driveLetter.Length);
+            }
+        }
 
         protected override string Validate(string columnName)
         {

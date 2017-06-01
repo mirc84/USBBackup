@@ -125,6 +125,9 @@ namespace USBBackup
             {
                 try
                 {
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
+
                     PauseWaitHandle.WaitOne();
                     Backup.IsPaused = false;
                     if (cancellationToken.IsCancellationRequested)
@@ -180,6 +183,10 @@ namespace USBBackup
                     {
                         try
                         {
+                            if (PauseCancellationTokenSource.Token.IsCancellationRequested)
+                            {
+                                PauseCancellationTokenSource = new CancellationTokenSource();
+                            }
                             var copyTask = fileStream.CopyToAsync(targetFileStream, 81920,
                                 PauseCancellationTokenSource.Token);
 
@@ -198,20 +205,8 @@ namespace USBBackup
                             if (!(ex.InnerException is TaskCanceledException))
                                 throw;
                         }
-
-                        PauseWaitHandle.WaitOne();
-                        if (PauseCancellationTokenSource.Token.IsCancellationRequested)
-                        {
-                            PauseCancellationTokenSource = new CancellationTokenSource();
-                            if (cancellationToken.IsCancellationRequested)
-                            {
-                                if (CancellationTokenSource.IsCancellationRequested)
-                                {
-                                    CancellationTokenSource = new CancellationTokenSource();
-                                }
-                                cancellationToken = CancellationTokenSource.Token;
-                            }
-                        }
+                        if (!cancellationToken.IsCancellationRequested)
+                            PauseWaitHandle.WaitOne();
                     }
                 }
                 isCopyFileCompleted = fileStream.Position == fileStream.Length;

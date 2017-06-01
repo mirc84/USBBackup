@@ -63,11 +63,12 @@
                                 <TextBlock Margin="4" Text="{Binding Model}"></TextBlock>
                             </StackPanel>
                         </Expander.Header>
-                        <StackPanel IsEnabled="{Binding IsAttached}">
+                        <StackPanel>
                             <ItemsControl ItemsSource="{Binding Backups}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="Backup">
-                                        <controls:BackupControl Backup="{Binding }"  RunPauseResumeBackupCommand="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.RunPauseResumeBackupCommand}"
+                                        <controls:BackupControl Backup="{Binding }"
+                                                                RunPauseResumeBackupCommand="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.RunPauseResumeBackupCommand}"
                                                                 CancelBackupCommand="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.CancelBackupCommand}"
                                                                 RemoveBackupCommand="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow}, Path=DataContext.RemoveBackupCommand}"/>
                                     </DataTemplate>

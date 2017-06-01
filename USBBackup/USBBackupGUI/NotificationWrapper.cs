@@ -4,7 +4,7 @@ using System.Linq;
 using USBBackup.Core;
 using USBBackup.Entities;
 
-namespace USBBackup
+namespace USBBackupGUI
 {
     public class DriveNotificationWrapper : NotificationObject
     {
