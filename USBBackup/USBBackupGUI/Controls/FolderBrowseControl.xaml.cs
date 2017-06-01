@@ -19,6 +19,18 @@ namespace USBBackupGUI.Controls
 
         #region Properties
 
+
+        public bool IsReadOnly
+        {
+            get { return (bool)GetValue(IsReadOnlyProperty); }
+            set { SetValue(IsReadOnlyProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for IsReadOnly.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty IsReadOnlyProperty =
+            DependencyProperty.Register("IsReadOnly", typeof(bool), typeof(FolderBrowseControl), new PropertyMetadata(false));
+
+
         public static readonly DependencyProperty PathRestrictionProperty = DependencyProperty.Register(
             "PathRestriction", typeof(string), typeof(FolderBrowseControl), new PropertyMetadata(default(string)));
 

@@ -120,6 +120,7 @@
     <Compile Include="Controls\BackupControl.xaml.cs">
       <DependentUpon>BackupControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Converters\InvertBoolConverter.cs" />
     <Compile Include="Controls\FolderBrowseControl.xaml.cs">
       <DependentUpon>FolderBrowseControl.xaml</DependentUpon>
     </Compile>

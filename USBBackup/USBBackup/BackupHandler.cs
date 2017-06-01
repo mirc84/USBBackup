@@ -155,7 +155,7 @@ namespace USBBackup
             {
                 backupRunner.CancellationTokenSource.Cancel();
                 if (hardCancel)
-                    backupRunner.PauseCancellationTokenSource.Cancel();
+                    backupRunner.PauseCancellationTokenSource?.Cancel();
                 
                 backupRunner.PauseWaitHandle.Set();
             }

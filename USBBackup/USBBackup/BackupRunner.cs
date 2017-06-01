@@ -180,10 +180,6 @@ namespace USBBackup
                     {
                         try
                         {
-                            if (PauseCancellationTokenSource.Token.IsCancellationRequested)
-                            {
-                                PauseCancellationTokenSource = new CancellationTokenSource();
-                            }
                             var copyTask = fileStream.CopyToAsync(targetFileStream, 81920,
                                 PauseCancellationTokenSource.Token);
 
@@ -204,6 +200,18 @@ namespace USBBackup
                         }
 
                         PauseWaitHandle.WaitOne();
+                        if (PauseCancellationTokenSource.Token.IsCancellationRequested)
+                        {
+                            PauseCancellationTokenSource = new CancellationTokenSource();
+                            if (cancellationToken.IsCancellationRequested)
+                            {
+                                if (CancellationTokenSource.IsCancellationRequested)
+                                {
+                                    CancellationTokenSource = new CancellationTokenSource();
+                                }
+                                cancellationToken = CancellationTokenSource.Token;
+                            }
+                        }
                     }
                 }
                 isCopyFileCompleted = fileStream.Position == fileStream.Length;

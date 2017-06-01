@@ -95,9 +95,11 @@
 
         <Label Grid.Row="3" Grid.Column="1" Content="{lex:Loc USBBackup:StringResource:BackupSource}"></Label>
         <local:FolderBrowseControl Grid.Row="3" Grid.Column="1" ValueChanged="FolderBrowseControl_ValueChanged"
+                                   IsReadOnly="{Binding IsRunning}"
                                    SelectedPath="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup.SourcePath, Mode=TwoWay, ValidatesOnDataErrors=True}" />
         <Label Grid.Row="3" Grid.Column="2" Content="{lex:Loc USBBackup:StringResource:BackupTarget}"></Label>
         <local:FolderBrowseControl Grid.Row="3" Grid.Column="2" ValueChanged="FolderBrowseControl_ValueChanged"
+                                   IsReadOnly="{Binding IsRunning}"
                                    SelectedPath="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:BackupControl}, Path=Backup.TargetPath, Mode=TwoWay, ValidatesOnDataErrors=True}"/>
 
         <Button Margin="4" Grid.Row="3" Grid.Column="3"

@@ -106,7 +106,9 @@ namespace USBBackupGUI
             if (backup == null)
                 return;
 
-            var choice = OnUserChoiceRequested(new Loc(nameof(StringResource.UserChoice_HardCancel)),
+            var choice = backup.IsPaused 
+                ? MessageBoxResult.Yes
+                : OnUserChoiceRequested(new Loc(nameof(StringResource.UserChoice_HardCancel)),
                 new Loc(nameof(StringResource.UserChoice_HardCancel_Caption)), MessageBoxButton.YesNoCancel);
             if (choice == MessageBoxResult.Cancel)
                 return;
